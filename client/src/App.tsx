@@ -1,9 +1,10 @@
+// App.tsx
 import React from 'react';
 import MissionForm from './components/mission_form';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <div className="App">
+    <div>
       <MissionForm />
     </div>
   );

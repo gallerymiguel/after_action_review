@@ -1,10 +1,11 @@
 import { FormData } from '../interfaces/formdata';
 
-export const saveFormData = (formData: FormData): void => {
-  localStorage.setItem('formData', JSON.stringify(formData));
+export const saveFormData = (formdata: FormData): void => {
+  localStorage.setItem('formData', JSON.stringify(formdata));
 };
 
 export const loadFormData = (): FormData | null => {
   const storedFormData = localStorage.getItem('formData');
   return storedFormData ? JSON.parse(storedFormData) : null;
 };
+

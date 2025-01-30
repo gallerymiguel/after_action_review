@@ -1,6 +1,6 @@
 export interface FormData {
     missionName: string;
-    missionDate: string;
+    missionDate: Date;
     missionUnit: string;
     missionEvent: string;
   }
