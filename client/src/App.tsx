@@ -1,13 +1,46 @@
 import React from "react";
-import CorporateLayout from "./components/corporate_layout"; // Ensure this matches your file name
-import "./App.css";
+import { CssBaseline, Box, Container } from "@mui/material";
+import { Outlet, useLocation } from "react-router-dom";
+import NavigationBar from "./components/nav";
 
+// Debug Component to Log Current Location
+const DebugLocation: React.FC = () => {
+  const location = useLocation();
+  console.log("Current Path:", location.pathname);
+  return null; // This component doesn't render anything on the UI
+};
+
+// Layout Component for Navigation and Main Content
 const App: React.FC = () => {
   return (
-    <CorporateLayout>
-      <h1>Welcome to the Corporate Platform</h1>
-      <p>This is the main content area where you can add your application details.</p>
-    </CorporateLayout>
+    <>
+      <CssBaseline />
+      <NavigationBar />
+      {/* Wrapper to ensure full page scroll */}
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        {/* Centering Main Content */}
+        <Container
+          maxWidth="lg"
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            mt: 4,
+            px: 3, // Adds some padding on small screens
+          }}
+        >
+          <DebugLocation />
+          <Outlet />
+        </Container>
+        {/* Footer at the bottom */}
+        <Box component="footer" sx={{ textAlign: "center", py: 3, backgroundColor: "#f5f5f5", mt: "auto" }}>
+          © {new Date().getFullYear()} AAR Platform
+        </Box>
+      </Box>
+    </>
   );
 };
 
