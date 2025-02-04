@@ -166,23 +166,23 @@ const MissionForm: React.FC = () => {
       alert("⚠️ Event Name is required before saving.");
       return;
     }
-  
+
     // Ensure the last improvement is saved before adding event
     const updatedImprovements = [
-      ...(currentEvent.improveDetailsArray || []), 
+      ...(currentEvent.improveDetailsArray || []),
       { ...currentEvent.improveDetails } // Include the most recent improvement
     ];
-  
+
     // Save the event with both sustains and all improvements
     const newEvent: EventEntry = {
       eventName: currentEvent.eventName,
       type: currentEvent.type,
-      sustainDetails: [...(currentEvent.sustainDetails || [])], 
+      sustainDetails: [...(currentEvent.sustainDetails || [])],
       improveDetailsArray: updatedImprovements, // Now includes the last entered improvement
     };
-  
+
     setEvents((prevEvents) => [...prevEvents, newEvent]);
-  
+
     // Reset for new event
     setCurrentEvent({
       eventName: "",
@@ -192,8 +192,8 @@ const MissionForm: React.FC = () => {
       improveDetails: { observation: "", howToFix: "", whoWillFix: "", whenWillFix: "" },
     });
   };
-  
-  
+
+
 
   const removeEvent = (index: number) => {
     const updatedEvents = events.filter((_, i) => i !== index);
@@ -231,20 +231,20 @@ const MissionForm: React.FC = () => {
       summary: showSummaryHero && !summary,
       hero: showSummaryHero && !hero,
     };
-  
+
     setErrors(newErrors);
-  
+
     // If any field is missing, show an alert and stop submission
     if (Object.values(newErrors).some((error) => error)) {
       alert("⚠️ Please fill out all required fields.");
       return;
     }
-  
+
     // If all fields are valid, save the mission and navigate to the review page
     alert("Mission form has been saved successfully! ✅");
-    navigate("/saving_mission_review", { state: { mission, events: [...events], summary, hero } });
+    navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
   };
-  
+
 
   const formatLabel = (key: string) => {
     const labelMap: { [key: string]: string } = {

@@ -3,9 +3,9 @@ import { CssBaseline, Box, Container } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import NavigationBar from "./components/nav";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MissionForm from "./components/mission_form";
-import SavingMissionReview from "./pages/saving_mission_review";
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import MissionForm from "./components/mission_form";
+// import SavingMissionReview from "./pages/saving_mission_review";
 
 
 
