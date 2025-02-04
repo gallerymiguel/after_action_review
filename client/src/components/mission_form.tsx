@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -23,13 +24,13 @@ interface MissionDetails {
 interface EventEntry {
   eventName: string;
   type: "sustain" | "improve" | null;
-  sustainDetails?: string;
+  sustainDetails?: string[];
   improveDetails?: {
     observation: string;
     howToFix: string;
     whoWillFix: string;
     whenWillFix: string;
-  };
+  }[]; // <-- Change improveDetails to an array of objects
 }
 
 // Main mission form component
@@ -44,11 +45,20 @@ const MissionForm: React.FC = () => {
   const [currentEvent, setCurrentEvent] = useState<EventEntry>({
     eventName: "",
     type: null,
+    improveDetails: {
+      observation: "",
+      howToFix: "",
+      whoWillFix: "",
+      whenWillFix: "",
+    },
   });
+
   const [summary, setSummary] = useState("");
   const [hero, setHero] = useState("");
   const [showSummaryHero, setShowSummaryHero] = useState(false);
   const [showEventSection, setShowEventSection] = useState(true);
+  const [showImprovementSaved, setShowImprovementSaved] = useState(false);
+  const navigate = useNavigate();
 
   // Handles changes to mission details
   const handleMissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,38 +78,132 @@ const MissionForm: React.FC = () => {
 
   // Handles selection between sustain and improve
   const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedType = e.target.value as "sustain" | "improve";
+
     setCurrentEvent({
       ...currentEvent,
-      type: e.target.value as "sustain" | "improve",
+      type: selectedType,
+      sustainDetails:
+        selectedType === "sustain" ? [""] : currentEvent.sustainDetails, // Start with 1 sustain field
+      improveDetails:
+        selectedType === "improve"
+          ? {
+              observation: [""],
+              howToFix: [""],
+              whoWillFix: [""],
+              whenWillFix: [""],
+            }
+          : currentEvent.improveDetails, // Start with 1 set of improve fields
     });
   };
 
-  // Handles changes to improvement details
-  const handleImproveDetailsChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const saveAndNextImprovement = () => {
     if (currentEvent.type === "improve") {
+      const updatedImprovements = [
+        ...(currentEvent.improveDetailsArray || []),
+        currentEvent.improveDetails,
+      ];
+
       setCurrentEvent({
         ...currentEvent,
+        improveDetailsArray: updatedImprovements,
         improveDetails: {
-          ...currentEvent.improveDetails,
-          [e.target.name]: e.target.value,
+          observation: "",
+          howToFix: "",
+          whoWillFix: "",
+          whenWillFix: "",
         },
       });
+
+      // Show the saved message
+      setShowImprovementSaved(true);
+
+      // Hide the message after 3 seconds
+      setTimeout(() => {
+        setShowImprovementSaved(false);
+      }, 3000);
     }
   };
 
+  // Handles changes to improvement details
+  const handleImproveDetailsChange =
+    (index: number, field: keyof EventEntry["improveDetails"][0]) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (currentEvent.type === "improve") {
+        const updatedImprovements = [...(currentEvent.improveDetails || [])];
+        updatedImprovements[index] = {
+          ...updatedImprovements[index],
+          [field]: e.target.value,
+        };
+
+        setCurrentEvent({
+          ...currentEvent,
+          improveDetails: updatedImprovements,
+        });
+      }
+    };
+
   // Handles changes to sustain details
-  const handleSustainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSustainChange = (index: number, value: string) => {
     if (currentEvent.type === "sustain") {
-      setCurrentEvent({ ...currentEvent, sustainDetails: e.target.value });
+      const updatedSustains = [...(currentEvent.sustainDetails || [])];
+      updatedSustains[index] = value; // Modify only the specific sustain entry
+      setCurrentEvent({ ...currentEvent, sustainDetails: updatedSustains });
+    }
+  };
+
+  const removeSustain = (index: number) => {
+    if (currentEvent.type === "sustain") {
+      const updatedSustains = [...(currentEvent.sustainDetails || [])];
+      updatedSustains.splice(index, 1); // Remove the specific entry
+      setCurrentEvent({ ...currentEvent, sustainDetails: updatedSustains });
     }
   };
 
   // Adds an event to the events list
   const addEvent = () => {
-    setEvents([...events, currentEvent]);
-    setCurrentEvent({ eventName: "", type: null });
+    if (currentEvent.eventName.trim() === "") {
+      alert("⚠️ Event Name is required before saving.");
+      return;
+    }
+
+    // Ensure the last improvement is saved before adding event
+    const updatedImprovements = [
+      ...(currentEvent.improveDetailsArray || []),
+      { ...currentEvent.improveDetails } // Include the most recent improvement
+    ];
+
+    // Save the event with both sustains and all improvements
+    const newEvent: EventEntry = {
+      eventName: currentEvent.eventName,
+      type: currentEvent.type,
+      sustainDetails: [...(currentEvent.sustainDetails || [])],
+      improveDetailsArray: updatedImprovements, // Now includes the last entered improvement
+    };
+
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+
+    // Reset for new event
+    setCurrentEvent({
+      eventName: "",
+      type: null,
+      sustainDetails: [""],
+      improveDetailsArray: [],
+      improveDetails: { observation: "", howToFix: "", whoWillFix: "", whenWillFix: "" },
+    });
+  };
+
+
+
+  const removeEvent = (index: number) => {
+    const updatedEvents = events.filter((_, i) => i !== index);
+    setEvents(updatedEvents);
+
+    // If all events are deleted, bring the user back to adding mode
+    if (updatedEvents.length === 0) {
+      setShowSummaryHero(false);
+      setShowEventSection(true);
+    }
   };
 
   // Toggles visibility of event section and summary
@@ -136,8 +240,20 @@ const MissionForm: React.FC = () => {
       return;
     }
 
-    // If all fields are valid, submit the form
+    // If all fields are valid, save the mission and navigate to the review page
     alert("Mission form has been saved successfully! ✅");
+    navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
+  };
+
+
+  const formatLabel = (key: string) => {
+    const labelMap: { [key: string]: string } = {
+      observation: "Observation",
+      howToFix: "How to Fix",
+      whoWillFix: "Who Will Fix It",
+      whenWillFix: "When Will It Be Fixed",
+    };
+    return labelMap[key] || key; // Default to original key if not found
   };
 
   return (
@@ -226,7 +342,6 @@ const MissionForm: React.FC = () => {
               required
               sx={{ my: 2 }}
             />
-
             {/* Render radio buttons for Sustain or Improve based on event name entry */}
             {currentEvent.eventName && (
               <FormControl component="fieldset">
@@ -249,52 +364,139 @@ const MissionForm: React.FC = () => {
                 </RadioGroup>
               </FormControl>
             )}
-
             {/* Conditionally render input fields based on the selection of sustain or improve */}
+            {/* Sustain Input */}
             {currentEvent.type === "sustain" && (
-              <TextField
-                label="What would you like to sustain?"
-                name="sustainDetails"
-                value={currentEvent.sustainDetails || ""}
-                onChange={handleSustainChange}
-                fullWidth
-                required
-                sx={{ my: 2 }}
-              />
+              <>
+                {currentEvent.sustainDetails?.map((sustain, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      my: 2,
+                    }}
+                  >
+                    <TextField
+                      label={`Sustain Detail ${index + 1}`}
+                      value={sustain}
+                      onChange={(e) =>
+                        handleSustainChange(index, e.target.value)
+                      }
+                      fullWidth
+                      required
+                    />
+                    {currentEvent.sustainDetails.length > 1 && ( // Only show remove button if there's more than one
+                      <Button
+                        onClick={() => removeSustain(index)}
+                        variant="outlined"
+                        color="error"
+                      >
+                        🗑 Remove
+                      </Button>
+                    )}
+                  </Box>
+                ))}
+                <Button
+                  onClick={() =>
+                    setCurrentEvent({
+                      ...currentEvent,
+                      sustainDetails: [
+                        ...(currentEvent.sustainDetails || []),
+                        "",
+                      ], // Add a new empty sustain entry
+                    })
+                  }
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                >
+                  ➕ Add Another Sustain
+                </Button>
+              </>
             )}
 
+            {/* Improve Inputs */}
             {currentEvent.type === "improve" && (
               <Box sx={{ my: 2 }}>
                 <TextField
                   label="Observation"
-                  name="observation"
-                  onChange={handleImproveDetailsChange}
+                  value={currentEvent.improveDetails?.observation || ""}
+                  onChange={(e) =>
+                    setCurrentEvent({
+                      ...currentEvent,
+                      improveDetails: {
+                        ...currentEvent.improveDetails,
+                        observation: e.target.value,
+                      },
+                    })
+                  }
                   fullWidth
                   required
                 />
                 <TextField
                   label="How to Fix"
-                  name="howToFix"
-                  onChange={handleImproveDetailsChange}
+                  value={currentEvent.improveDetails?.howToFix || ""}
+                  onChange={(e) =>
+                    setCurrentEvent({
+                      ...currentEvent,
+                      improveDetails: {
+                        ...currentEvent.improveDetails,
+                        howToFix: e.target.value,
+                      },
+                    })
+                  }
                   fullWidth
                   required
                 />
                 <TextField
                   label="Who Will Fix?"
-                  name="whoWillFix"
-                  onChange={handleImproveDetailsChange}
+                  value={currentEvent.improveDetails?.whoWillFix || ""}
+                  onChange={(e) =>
+                    setCurrentEvent({
+                      ...currentEvent,
+                      improveDetails: {
+                        ...currentEvent.improveDetails,
+                        whoWillFix: e.target.value,
+                      },
+                    })
+                  }
                   fullWidth
                   required
                 />
                 <TextField
                   label="When Will It Be Fixed?"
-                  name="whenWillFix"
-                  onChange={handleImproveDetailsChange}
+                  value={currentEvent.improveDetails?.whenWillFix || ""}
+                  onChange={(e) =>
+                    setCurrentEvent({
+                      ...currentEvent,
+                      improveDetails: {
+                        ...currentEvent.improveDetails,
+                        whenWillFix: e.target.value,
+                      },
+                    })
+                  }
                   fullWidth
                   required
                 />
+                {showImprovementSaved && (
+                  <Typography color="success" sx={{ mt: 1 }}>
+                    ✅ Improvement has been saved!
+                  </Typography>
+                )}
+
+                <Button
+                  onClick={saveAndNextImprovement}
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                >
+                  ➡️ Next Improvement
+                </Button>
               </Box>
             )}
+
             {currentEvent.type && (
               <Button
                 onClick={addEvent}
@@ -353,38 +555,49 @@ const MissionForm: React.FC = () => {
             </Button>
           </Box>
         )}
-        {events.length > 0 && (
-          <Box sx={{ width: "100%", mt: 4 }}>
-            <Typography variant="h5">Events Added:</Typography>
-            {events.map((event, index) => (
-              <Box
-                key={index}
-                sx={{ my: 2, p: 2, border: "1px solid gray", borderRadius: 2 }}
-              >
-                <Typography variant="h6">{event.eventName}</Typography>
-                {event.type === "sustain" && (
-                  <Typography>Sustain: {event.sustainDetails}</Typography>
-                )}
-                {event.type === "improve" && (
-                  <>
-                    <Typography>
-                      Observation: {event.improveDetails?.observation}
-                    </Typography>
-                    <Typography>
-                      How to Fix: {event.improveDetails?.howToFix}
-                    </Typography>
-                    <Typography>
-                      Who Will Fix: {event.improveDetails?.whoWillFix}
-                    </Typography>
-                    <Typography>
-                      When Will Fix: {event.improveDetails?.whenWillFix}
-                    </Typography>
-                  </>
-                )}
-              </Box>
-            ))}
+        {events.map((event, index) => (
+  <Box key={index} sx={{ my: 2, p: 2, border: "1px solid gray", borderRadius: 2 }}>
+    <Typography variant="h6">{event.eventName}</Typography>
+
+    {/* Display Sustain Details */}
+    {event.sustainDetails?.length > 0 && event.sustainDetails[0] !== "" && (
+      <>
+        <Typography variant="subtitle1"><strong>Sustain:</strong></Typography>
+        {event.sustainDetails.map((sustain, i) => (
+          <Typography key={i}>- {sustain}</Typography>
+        ))}
+      </>
+    )}
+
+    {/* Display Improvements */}
+    {event.improveDetailsArray && event.improveDetailsArray.length > 0 ? (
+      <>
+        <Typography variant="subtitle1"><strong>Improvements:</strong></Typography>
+        {event.improveDetailsArray.map((improve, i) => (
+          <Box key={i} sx={{ mt: 1, p: 1, borderBottom: "1px solid gray" }}>
+            <Typography>🔍 <strong>Observation:</strong> {improve.observation}</Typography>
+            <Typography>🛠 <strong>How to Fix:</strong> {improve.howToFix}</Typography>
+            <Typography>👷 <strong>Who Will Fix:</strong> {improve.whoWillFix}</Typography>
+            <Typography>📅 <strong>When Will Fix:</strong> {improve.whenWillFix}</Typography>
           </Box>
-        )}
+        ))}
+      </>
+    ) : (
+      <Typography color="textSecondary">No improvements added.</Typography>
+    )}
+
+    {/* Remove Event Button */}
+    <Button
+      onClick={() => removeEvent(index)}
+      variant="outlined"
+      color="error"
+      sx={{ ml: 1 }}
+    >
+      🗑 Remove
+    </Button>
+  </Box>
+))}
+
       </Container>
     </Box>
   );

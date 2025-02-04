@@ -6,6 +6,9 @@ import HomePage from "./pages/landingpage";
 import ErrorPage from "./pages/error";
 import LoginPage from "./pages/login";
 import CreateAccountPage from "./pages/register";
+import MissionForm from "./components/mission_form";
+import ReviewPage from "./pages/saving_mission_review";
+
 
 const router = createBrowserRouter([
   {
@@ -16,7 +19,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
-
+      { path: "review", element: <MissionForm /> },
+      { path: "save_mission", element: <ReviewPage /> },
     ],
   },
 ]);

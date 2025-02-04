@@ -2,9 +2,11 @@ import React from "react";
 import { CssBaseline, Box, Container } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import NavigationBar from "./components/nav";
-import CorporateLayout from "./components/corporate_layout"; // Ensure this matches your file name
-import MissionForm from './components/mission_form';
 import "./App.css";
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import MissionForm from "./components/mission_form";
+// import SavingMissionReview from "./pages/saving_mission_review";
+
 
 
 // Debug Component to Log Current Location
@@ -61,6 +63,12 @@ const App: React.FC = () => {
 
       </Box>
     </>
+    // <Router>
+    //   <Routes>
+    //     <Route path="/" element={<MissionForm />} />
+    //     <Route path="/saving_mission_review" element={<SavingMissionReview />} />
+    //   </Routes>
+    // </Router>
   );
 };
 
