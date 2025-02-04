@@ -2,6 +2,11 @@ import React from "react";
 import { CssBaseline, Box, Container } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import NavigationBar from "./components/nav";
+import CorporateLayout from "./components/corporate_layout"; // Ensure this matches your file name
+import MissionForm from './components/mission_form';
+        
+import "./App.css";
+
 
 // Debug Component to Log Current Location
 const DebugLocation: React.FC = () => {
