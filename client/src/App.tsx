@@ -41,10 +41,26 @@ const App: React.FC = () => {
           <DebugLocation />
           <Outlet />
         </Container>
+
         {/* Footer at the bottom */}
-        <Box component="footer" sx={{ textAlign: "center", py: 3, backgroundColor: "#f5f5f5", mt: "auto" }}>
-          © {new Date().getFullYear()} AAR Platform
+        <Box 
+          component="footer" 
+          sx={{ 
+            width: "100vw",  
+            backgroundColor: "#f5f5f5",  
+            mt: "auto",  
+            py: 3,  
+          }} 
+        >
+          {/* Content inside should match navbar width */}
+          <Container 
+            maxWidth="lg"  
+            sx={{ textAlign: "center", px: 3 }} 
+          >
+            © {new Date().getFullYear()} AAR Platform
+          </Container>
         </Box>
+
       </Box>
     </>
     // <Router>

@@ -11,7 +11,17 @@ const LandingPage: React.FC = () => {
         <Typography variant="h5" color="textSecondary" paragraph>
           A structured process to analyze what happened, why it happened, and how it can be improved.
         </Typography>
-        <Button variant="contained" color="primary" href="/reviews">
+        <Button
+          variant="contained"
+          color="primary"
+          href="/login"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'secondary.main', 
+              color: 'white',
+            },
+          }}
+        >
           Get Started
         </Button>
       </Box>
