@@ -3,7 +3,6 @@ import { CssBaseline, Box, Container } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import NavigationBar from "./components/nav";
 import MissionForm from './components/mission_form';
-
 import "./App.css";
 
 
