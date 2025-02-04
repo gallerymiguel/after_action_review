@@ -6,7 +6,7 @@ import HomePage from "./pages/landingpage";
 import ErrorPage from "./pages/error";
 import LoginPage from "./pages/login";
 import CreateAccountPage from "./pages/register";
-import MissionForm from "./components/mission_form";
+import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 
 
