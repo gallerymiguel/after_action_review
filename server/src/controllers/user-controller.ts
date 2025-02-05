@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
     return res.json({ token, user });
 };
 
-export const newReport= async(req: Request, res: Response) => {
+export const newMission= async(req: Request, res: Response) => {
     const report= await Report.create(req.body);
 
     if (!report) {
@@ -54,7 +54,7 @@ export const newReport= async(req: Request, res: Response) => {
     return res.json({report});
 }
 
-export const deleteReport= async (req: Request, res: Response) => {
+export const deleteMission= async (req: Request, res: Response) => {
     const userUpdate= await User.findOneAndUpdate(
         {_id: req.user._id},
         {$pull: {savedReports: {reportId: req.params.bookId}}},

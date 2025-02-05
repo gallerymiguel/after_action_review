@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './utils/auth.js';
 
+import userRoutes from "./routes/api/user-routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,6 +18,8 @@ const server = new ApolloServer({
   typeDefs,
   resolvers
 });
+
+
 
 const startApolloServer = async () => {
   await server.start();
@@ -27,7 +30,7 @@ const startApolloServer = async () => {
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
-
+  app.use("/users", userRoutes);
   app.use('/graphql', expressMiddleware(server as any,
     {
       context: authenticateToken as any
