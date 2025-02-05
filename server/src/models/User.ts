@@ -78,7 +78,7 @@ userSchema.methods.isCorrectPassword = async function (password: string) {
 
 // Remove unit if user is Evaluator
 userSchema.pre('save', function(next) {
-  if (this.role === UserRole.Evaluator && this.unit) {
+  if (this.role === UserRole.EVALUATOR && this.unit) {
     this.unit = undefined;
   }
   next();

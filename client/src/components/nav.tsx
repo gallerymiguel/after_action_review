@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const NavigationBar: React.FC = () => {
   const menuItems = [
     { text: "Home", icon: <Home />, path: "/" },
-    { text: "New Review", icon: <RateReview />, path: "/reviews" },
+    { text: "New Review", icon: <RateReview />, path: "/review" },
     { text: "My Reviews", icon: <LibraryBooks />, path: "/dashboard" },
     { text: "Logout", icon: <ExitToApp />, path: "/login" }, //change this to login too!!!! backend shite 0_0
   ];
