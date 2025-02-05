@@ -17,7 +17,7 @@ const LandingPage: React.FC = () => {
           href="/login"
           sx={{
             '&:hover': {
-              backgroundColor: 'secondary.main', 
+              backgroundColor: 'primary.dark', 
               color: 'white',
             },
           }}

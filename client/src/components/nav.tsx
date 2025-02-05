@@ -1,6 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box, Container } from "@mui/material";
-import { Home, RateReview, LibraryBooks, ExitToApp } from "@mui/icons-material";
+import { Home, RateReview, LibraryBooks, ExitToApp, Login } from "@mui/icons-material"; //exit to app is for logout
 import { Link } from "react-router-dom";
 
 const NavigationBar: React.FC = () => {
@@ -8,7 +8,7 @@ const NavigationBar: React.FC = () => {
     { text: "Home", icon: <Home />, path: "/" },
     { text: "New Review", icon: <RateReview />, path: "/review" },
     { text: "My Reviews", icon: <LibraryBooks />, path: "/dashboard" },
-    { text: "Logout", icon: <ExitToApp />, path: "/login" }, //change this to login too!!!! backend shite 0_0
+    { text: "Login", icon: <Login />, path: "/login" } //change this to login too!!!! backend shite 0_0
   ];
 
   return (
@@ -38,7 +38,7 @@ const NavigationBar: React.FC = () => {
                 sx={{
                   mx: 1,
                   '&:hover': {
-                    backgroundColor: 'secondary.main',
+                    backgroundColor: 'primary.dark',
                     color: 'white',
                   },
                 }}
