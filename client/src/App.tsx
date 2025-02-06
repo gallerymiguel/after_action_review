@@ -7,8 +7,6 @@ import "./App.css";
 // import MissionForm from "./components/mission_form";
 // import SavingMissionReview from "./pages/saving_mission_review";
 
-
-
 // Debug Component to Log Current Location
 const DebugLocation: React.FC = () => {
   const location = useLocation();
@@ -16,26 +14,32 @@ const DebugLocation: React.FC = () => {
   return null; // This component doesn't render anything on the UI
 };
 
-// Layout Component for Navigation and Main Content
 const App: React.FC = () => {
   return (
     <>
       <CssBaseline />
       <NavigationBar />
-      {/* Wrapper to ensure full page scroll */}
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        {/* Centering Main Content */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh", // Limit total height to prevent scrolling
+          overflow: "hidden", // Prevents unnecessary scrollbars
+        }}
+      >
+        {/* Main Content Area */}
         <Container
-          maxWidth="lg"
+          maxWidth={false} 
           sx={{
+            width: "100vw", 
+            maxWidth: "100%", 
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            mt: 4,
-            px: 3, // Adds some padding on small screens
+            px: 0, 
           }}
         >
           <DebugLocation />
@@ -43,32 +47,19 @@ const App: React.FC = () => {
         </Container>
 
         {/* Footer at the bottom */}
-        <Box 
-          component="footer" 
-          sx={{ 
-            width: "100vw",  
-            backgroundColor: "#f5f5f5",  
-            mt: "auto",  
-            py: 3,  
-          }} 
+        <Box
+          component="footer"
+          sx={{
+            width: "100vw",
+            backgroundColor: "#f5f5f5",
+            py: 2, 
+            textAlign: "center",
+          }}
         >
-          {/* Content inside should match navbar width */}
-          <Container 
-            maxWidth="lg"  
-            sx={{ textAlign: "center", px: 3 }} 
-          >
-            © {new Date().getFullYear()} AAR Platform
-          </Container>
+          <Container maxWidth="lg">© {new Date().getFullYear()} AAR Platform</Container>
         </Box>
-
       </Box>
     </>
-    // <Router>
-    //   <Routes>
-    //     <Route path="/" element={<MissionForm />} />
-    //     <Route path="/saving_mission_review" element={<SavingMissionReview />} />
-    //   </Routes>
-    // </Router>
   );
 };
 
