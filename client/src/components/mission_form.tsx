@@ -14,7 +14,7 @@ import {
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-import { fetchMissions } from "../utils/API";
+
 
 // Define types for mission details and event entries
 interface MissionDetails {
@@ -240,7 +240,7 @@ const MissionForm: React.FC = () => {
     hero: false,
   });
 
-  const handleSaveMission = () => {
+  const handleSaveMission = async () => {
     // Check for missing fields
     const newErrors = {
       missionName: !mission.missionName,
@@ -249,15 +249,15 @@ const MissionForm: React.FC = () => {
       summary: showSummaryHero && !summary,
       hero: showSummaryHero && !hero,
     };
-
+  
     setErrors(newErrors);
-
+  
     // If any field is missing, show an alert and stop submission
     if (Object.values(newErrors).some((error) => error)) {
       alert("⚠️ Please fill out all required fields.");
       return;
     }
-
+  
     const payload = {
       mission,
       events,
@@ -275,21 +275,21 @@ const MissionForm: React.FC = () => {
       });
   
       if (!response.ok) {
-        throw new Error("Failed to save mission");
+        throw new Error(`Failed to save mission. Status: ${response.status}`);
       }
   
+      const responseData = await response.json();
       alert("Mission form has been saved successfully! ✅");
-      navigate("/save_mission", { state: payload });
+      
+      // Navigate after successful save
+      navigate("/save_mission", { state: responseData });
     } catch (error) {
       console.error("Error saving mission:", error);
       alert("❌ Failed to save mission. Please try again.");
     }
   };
-
-    // If all fields are valid, save the mission and navigate to the review page
-    // alert("Mission form has been saved successfully! ✅");
-    // navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
-  };
+  
+ };
 
 
   const formatLabel = (key: string) => {
@@ -655,3 +655,15 @@ export default MissionForm;
 
 //-----------------------------------Messing with API stuff
 
+import { saveMission } from "../utils/API";
+
+const handleSaveMission = async () => {
+  try {
+    const responseData = await saveMission(payload);
+    alert("Mission saved!");
+    navigate("/save_mission", { state: responseData });
+  } catch (error) {
+    console.error(error);
+    alert("Mission save failed.");
+  }
+};
