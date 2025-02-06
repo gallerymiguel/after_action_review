@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+
+
 
 // Define types for mission details and event entries
 interface MissionDetails {
@@ -52,13 +54,29 @@ const MissionForm: React.FC = () => {
       whenWillFix: "",
     },
   });
+//---- new shit
+  const [missions, setMissions] = useState<MissionDetails[]>([]); // Store previous missions
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getMissions = async () => {
+      const data = await fetchMissions();
+      setMissions(data);
+    };
+    getMissions();
+  }, []);
+
+
+
+  //--- end of new shit
+
 
   const [summary, setSummary] = useState("");
   const [hero, setHero] = useState("");
   const [showSummaryHero, setShowSummaryHero] = useState(false);
   const [showEventSection, setShowEventSection] = useState(true);
   const [showImprovementSaved, setShowImprovementSaved] = useState(false);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   // Handles changes to mission details
   const handleMissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,7 +240,7 @@ const MissionForm: React.FC = () => {
     hero: false,
   });
 
-  const handleSaveMission = () => {
+  const handleSaveMission = async () => {
     // Check for missing fields
     const newErrors = {
       missionName: !mission.missionName,
@@ -231,19 +249,47 @@ const MissionForm: React.FC = () => {
       summary: showSummaryHero && !summary,
       hero: showSummaryHero && !hero,
     };
-
+  
     setErrors(newErrors);
-
+  
     // If any field is missing, show an alert and stop submission
     if (Object.values(newErrors).some((error) => error)) {
       alert("⚠️ Please fill out all required fields.");
       return;
     }
-
-    // If all fields are valid, save the mission and navigate to the review page
-    alert("Mission form has been saved successfully! ✅");
-    navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
+  
+    const payload = {
+      mission,
+      events,
+      summary,
+      hero,
+    };
+  
+    try {
+      const response = await fetch("https://your-api-url.com/missions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to save mission. Status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      alert("Mission form has been saved successfully! ✅");
+      
+      // Navigate after successful save
+      navigate("/save_mission", { state: responseData });
+    } catch (error) {
+      console.error("Error saving mission:", error);
+      alert("❌ Failed to save mission. Please try again.");
+    }
   };
+  
+ };
 
 
   const formatLabel = (key: string) => {
@@ -601,6 +647,23 @@ const MissionForm: React.FC = () => {
       </Container>
     </Box>
   );
-};
+//};
 
 export default MissionForm;
+
+
+
+//-----------------------------------Messing with API stuff
+
+import { saveMission } from "../utils/API";
+
+const handleSaveMission = async () => {
+  try {
+    const responseData = await saveMission(payload);
+    alert("Mission saved!");
+    navigate("/save_mission", { state: responseData });
+  } catch (error) {
+    console.error(error);
+    alert("Mission save failed.");
+  }
+};

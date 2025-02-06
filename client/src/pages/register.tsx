@@ -21,14 +21,14 @@ const CreateAccountPage: React.FC = () => {
     };
 
     return (
-        <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
             <Paper elevation={3} sx={{ padding: 3, width: '100%' }}>
                 <Box textAlign="center" mb={3}>
                     <Typography variant="h4">Create Account</Typography>
                 </Box>
                 <form onSubmit={handleFormSubmit}>
-                    <Grid container spacing={2}>
-
+                    <Grid container spacing={3}> {/* Increased spacing here from 2 to 3 */}
+                        
                         {/* Username Field */}
                         <Grid item xs={12}>
                             <TextField
@@ -38,6 +38,14 @@ const CreateAccountPage: React.FC = () => {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
+                                sx={{
+                                    '& .MuiInputLabel-root': {
+                                        top: '-10px', 
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        padding: '10px', 
+                                    },
+                                }}
                             />
                         </Grid>
 
@@ -51,6 +59,14 @@ const CreateAccountPage: React.FC = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                sx={{
+                                    '& .MuiInputLabel-root': {
+                                        top: '-10px',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        padding: '10px',
+                                    },
+                                }}
                             />
                         </Grid>
 
@@ -64,6 +80,14 @@ const CreateAccountPage: React.FC = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
+                                sx={{
+                                    '& .MuiInputLabel-root': {
+                                        top: '-10px',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        padding: '10px',
+                                    },
+                                }}
                             />
                         </Grid>
 
