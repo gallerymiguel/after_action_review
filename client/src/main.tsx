@@ -8,7 +8,7 @@ import LoginPage from "./pages/login";
 import CreateAccountPage from "./pages/register";
 import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
-
+import MyReviews from "./pages/myreviews";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +21,7 @@ const router = createBrowserRouter([
       { path: "register", element: <CreateAccountPage /> },
       { path: "review", element: <MissionForm /> },
       { path: "save_mission", element: <ReviewPage /> },
+      { path: "myreviews", element: <MyReviews /> },
     ],
   },
 ]);
