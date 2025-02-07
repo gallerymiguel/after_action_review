@@ -23,8 +23,8 @@ const App: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          height: "100vh", // Limit total height to prevent scrolling
-          overflow: "hidden", // Prevents unnecessary scrollbars
+          minHeight: "100vh", // ✅ minHeight instead of height
+          overflow: "auto", // ✅ allow scrolling 
         }}
       >
         {/* Main Content Area */}
