@@ -1,7 +1,5 @@
 import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
-// import reportSchema from './Report.js';
-// import type { ReportDocument } from './Report.js'
 import type { UnitDocument } from './Unit.js';
 
 export enum UserRole {
@@ -61,24 +59,23 @@ const userSchema = new Schema<UserDocument>(
   }
 );
 
-// hash user password
+// Hash user password before saving
 userSchema.pre('save', async function (next) {
   if (this.isNew || this.isModified('password')) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
   }
-
   next();
 });
 
-// custom method to compare and validate password for logging in
+// Custom method to compare passwords
 userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
-// Remove unit if user is Evaluator
-userSchema.pre('save', function(next) {
-  if (this.role === UserRole.Evaluator && this.unit) {
+// Ensure Evaluator role does not have a unit
+userSchema.pre('save', function (next) {
+  if (this.role === UserRole.EVALUATOR && this.unit) {
     this.unit = undefined;
   }
   next();

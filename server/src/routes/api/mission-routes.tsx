@@ -1,59 +1,131 @@
-import express from "express";
-import type Mission from "models/Mission"; // Import the Mongoose model
+import { Router, Request, Response } from "express";
+import User, { UserRole } from "../../models/User.js"; // Import User model
+import { authMiddleware } from "../../middleware/auth.js"; // Authentication middleware
+import jwt from "jsonwebtoken"; // JWT for authentication
 
-const router = express.Router();
+const router = Router();
 
-// **GET all missions**
-router.get("/", async (req, res) => {
+// 📌 REGISTER a new user
+router.post("/register", async (req: Request, res: Response) => {
   try {
-    const missions = await Mission.find();
-    res.status(200).json(missions);
+    const { username, email, password, role, unit } = req.body;
+
+    if (!username || !email || !password || !role) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (role === UserRole.USER && !unit) {
+      return res.status(400).json({ message: "Unit is required for USER role." });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already in use." });
+    }
+
+    const newUser = await User.create({ username, email, password, role, unit });
+
+    return res.status(201).json({ message: "User registered successfully!", user: newUser });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching missions", error });
+    console.error("Error registering user:", error);
+    return res.status(500).json({ message: "Server error", error });
   }
 });
 
-// **GET a single mission by ID**
-router.get("/:id", async (req, res) => {
+// 📌 LOGIN a user
+router.post("/login", async (req: Request, res: Response) => {
   try {
-    const mission = await Mission.findById(req.params.id);
-    if (!mission) return res.status(404).json({ message: "Mission not found" });
-    res.status(200).json(mission);
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const validPassword = await user.isCorrectPassword(password);
+    if (!validPassword) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Ensure `JWT_SECRET` is set
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined in environment variables.");
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+
+    // Generate JWT Token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.json({ message: "Login successful", token, user });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching mission", error });
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Server error", error });
   }
 });
 
-// **POST a new mission**
-router.post("/", async (req, res) => {
+// 📌 GET all users (Protected route - Admin only)
+router.get("/", authMiddleware, async (_req: Request, res: Response) => {
   try {
-    const newMission = new Mission(req.body);
-    await newMission.save();
-    res.status(201).json(newMission);
+    const users = await User.find().populate("unit");
+    return res.json(users);
   } catch (error) {
-    res.status(400).json({ message: "Error creating mission", error });
+    console.error("Error fetching users:", error);
+    return res.status(500).json({ message: "Server error", error });
   }
 });
 
-// **PUT (Update) an existing mission**
-router.put("/:id", async (req, res) => {
+// 📌 GET a single user by ID
+router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const updatedMission = await Mission.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!updatedMission) return res.status(404).json({ message: "Mission not found" });
-    res.status(200).json(updatedMission);
+    const user = await User.findById(req.params.id).populate("unit");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json(user);
   } catch (error) {
-    res.status(400).json({ message: "Error updating mission", error });
+    console.error("Error fetching user:", error);
+    return res.status(500).json({ message: "Server error", error });
   }
 });
 
-// **DELETE a mission**
-router.delete("/:id", async (req, res) => {
+// 📌 UPDATE a user by ID
+router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const deletedMission = await Mission.findByIdAndDelete(req.params.id);
-    if (!deletedMission) return res.status(404).json({ message: "Mission not found" });
-    res.status(200).json({ message: "Mission deleted successfully" });
+    const { username, email, role, unit } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { username, email, role, unit },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting mission", error });
+    console.error("Error updating user:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// 📌 DELETE a user by ID
+router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(500).json({ message: "Server error", error });
   }
 });
 

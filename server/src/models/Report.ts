@@ -1,15 +1,23 @@
-import {Schema, type Document} from 'mongoose';
+import { Schema, Document, model } from "mongoose";
 
+// Define the ReportDocument interface
 export interface ReportDocument extends Document {
     reportId: string;
     description: string;
 }
 
-const reportSchema= new Schema <ReportDocument>({
+// Define the Report schema
+const reportSchema = new Schema<ReportDocument>({
+    reportId: {
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         required: true,
     },
 });
 
-export default reportSchema;
+// ✅ Export the Report model correctly
+const Report = model<ReportDocument>("Report", reportSchema);
+export default Report;

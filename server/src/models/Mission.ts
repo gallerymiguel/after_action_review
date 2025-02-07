@@ -1,5 +1,5 @@
 import { Schema, model, type Document } from 'mongoose';
-import type { UnitDocument } from './Unit';
+import type { UnitDocument } from './Unit.js';
 
 export interface MissionDocument extends Document {
   id: string;

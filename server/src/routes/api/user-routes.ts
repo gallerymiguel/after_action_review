@@ -9,7 +9,7 @@
 // } from '../../controllers/user-controller.js';
 
 //import middleware
-import {authenticateToken} from '../../services/auth';
+import {authenticateToken} from '../../services/auth.js';
 
 // //put authMiddleware anywhere we need to send a token for verification of user
 // router.route('/').post(createUser).put(authenticateToken, newMission);
@@ -20,10 +20,10 @@ import {authenticateToken} from '../../services/auth';
 // export default router;
 
 import { Router } from "express";
-import bcrypt from "bcrypt";
-import User, { UserRole } from "../../models/User"; // Import User model
+// import bcrypt from "bcrypt";
+import User, { UserRole } from "../../models/User.js"; // Import User model
 //import jwt from "jsonwebtoken"; // For authentication (Optional)
-import { authMiddleware } from "../../middleware/auth"; // Custom auth middleware (if using JWT)
+import { authMiddleware } from "../../middleware/auth.js"; // Custom auth middleware (if using JWT)
 
 const router = Router();
 
@@ -51,10 +51,10 @@ router.post("/register", async (req, res) => {
     // Create new user
     const newUser = await User.create({ username, email, password, role, unit });
 
-    res.status(201).json({ message: "User registered successfully!", user: newUser });
+    return res.status(201).json({ message: "User registered successfully!", user: newUser });
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -82,15 +82,15 @@ router.post("/login", async (req, res) => {
 
     const token= authenticateToken;
 
-    res.json({ message: "Login successful", token, user });
+    return res.json({ message: "Login successful", token, user });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
 // 📌 GET all users (Protected route - Admin only)
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (_req, res) => {
   try {
     const users = await User.find().populate("unit"); // Populate Unit details
     res.json(users);
@@ -107,10 +107,10 @@ router.get("/:id", authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    return res.json(user);
   } catch (error) {
     console.error("Error fetching user:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -130,10 +130,10 @@ router.put("/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "User updated successfully", user: updatedUser });
+    return res.json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     console.error("Error updating user:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -145,11 +145,12 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "User deleted successfully" });
+    return res.json({ message: "User deleted successfully" }); // ✅ Ensures a return
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" }); // ✅ Ensures a return
   }
 });
+
 
 export default router;
