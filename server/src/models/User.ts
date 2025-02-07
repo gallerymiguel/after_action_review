@@ -73,8 +73,13 @@ userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
+<<<<<<< HEAD
 // Ensure Evaluator role does not have a unit
 userSchema.pre('save', function (next) {
+=======
+// Remove unit if user is Evaluator
+userSchema.pre('save', function(next) {
+>>>>>>> 1de292f5dc328a24fb9acb701a8653fcf366e971
   if (this.role === UserRole.EVALUATOR && this.unit) {
     this.unit = undefined;
   }

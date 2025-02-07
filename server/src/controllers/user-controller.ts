@@ -2,6 +2,8 @@ import type {Request, Response} from 'express';
 import User from '../models/User.js';
 import Report from '../models/Report.js';
 import {signToken} from '../services/auth.js';
+//import report model
+import Report from '../models/Report.js';
 
 // get a single user by either their id or their username
 export const getSingleUser= async (req: Request, res: Response) => {
@@ -44,14 +46,24 @@ export const login = async (req: Request, res: Response) => {
     return res.json({ token, user });
 };
 
+<<<<<<< HEAD
 export const newMission= async(req: Request, res: Response) => {
     const report= await Report.create(req.body);
+=======
+export const newReport = async (req: Request, res: Response) => {
+    try {
+        const report = await Report.create(req.body);
+>>>>>>> 1de292f5dc328a24fb9acb701a8653fcf366e971
 
-    if (!report) {
-        return res.status(400).json({ message: 'Something is wrong!'});
+        if (!report) {
+            return res.status(400).json({ message: 'Report creation failed!' });
+        }
+
+        return res.json({ report });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error: (error as Error).message });
     }
-    return res.json({report});
-}
+};
 
 export const deleteMission= async (req: Request, res: Response) => {
     const userUpdate= await User.findOneAndUpdate(
