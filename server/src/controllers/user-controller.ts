@@ -1,6 +1,7 @@
 import type {Request, Response} from 'express';
+//import user model
 import User from '../models/User.js';
-import Report from '../models/Report.js';
+//import sign token function from auth
 import {signToken} from '../services/auth.js';
 //import report model
 import Report from '../models/Report.js';
@@ -21,7 +22,7 @@ export const getSingleUser= async (req: Request, res: Response) => {
 // create a user, sign a token, and send it back (to client/src/components/SignUpForm.js)
 export const createUser = async (req: Request, res: Response) => {
     const user = await User.create(req.body);
-
+  
     if (!user) {
       return res.status(400).json({ message: 'Something is wrong!' });
     }
@@ -36,9 +37,9 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(400).json({ message: "Can't find this user" });
     }
-
+  
     const correctPw = await user.isCorrectPassword(req.body.password);
-
+  
     if (!correctPw) {
       return res.status(400).json({ message: 'Wrong password!' });
     }
@@ -46,14 +47,9 @@ export const login = async (req: Request, res: Response) => {
     return res.json({ token, user });
 };
 
-<<<<<<< HEAD
-export const newMission= async(req: Request, res: Response) => {
-    const report= await Report.create(req.body);
-=======
 export const newReport = async (req: Request, res: Response) => {
     try {
         const report = await Report.create(req.body);
->>>>>>> 1de292f5dc328a24fb9acb701a8653fcf366e971
 
         if (!report) {
             return res.status(400).json({ message: 'Report creation failed!' });
@@ -65,7 +61,7 @@ export const newReport = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteMission= async (req: Request, res: Response) => {
+export const deleteReport= async (req: Request, res: Response) => {
     const userUpdate= await User.findOneAndUpdate(
         {_id: req.user._id},
         {$pull: {savedReports: {reportId: req.params.bookId}}},

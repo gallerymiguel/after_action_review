@@ -1,4 +1,3 @@
-import User from './User.js';
-
+import User from './User';
 
 export default {User};
