@@ -15,7 +15,6 @@
 
 /* Ensure the entire page fills the viewport and is centered */
 html, body, #root {
-  overflow: hidden;
   height: 100%;
   width: 100%;
   margin: 0;

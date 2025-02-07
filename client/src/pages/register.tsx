@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import { useNavigate } from 'react-router-dom';
-import { ADD_USER } from '../utils/mutations.js';
 import { Container, TextField, Button, Typography, Paper, Box, Grid } from '@mui/material';
 
 const CreateAccountPage: React.FC = () => {
@@ -11,10 +8,7 @@ const CreateAccountPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
-    const [addUser] = useMutation(ADD_USER);
-    
-
-    const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (password !== confirmPassword) {
@@ -22,17 +16,8 @@ const CreateAccountPage: React.FC = () => {
             return;
         }
 
-        try {
-            const { data } = await addUser({
-                variables: { registerInput: { username, password } },
-            });
-            console.log(data);
-            localStorage.setItem('token', data.register.token);
-            window.location.assign('/');
-        } catch (err) {
-            console.error(err);
-            setError('Failed to create account');
-        }
+        console.log('Account created:', { username, password });
+        // api calls here !!!
     };
 
     return (
