@@ -3,21 +3,31 @@
  ![MIT](https://img.shields.io/badge/License-MIT-blue)
   
  ## Description
+ 
 This app was built using the MERN stack with a React front end, MongoDB database, and Node.js/Express.js server and API. It's purpose is to allow users to review accomplished tasks or "missions" and leave notes on what went wrong or right.
 
- ## Mock-Up Photos
+## Deployed Application
+
+Please feel free to access our deployed site:
+[Click me!](https://after-action-review.onrender.com/)
+
+ ## Photos
  
-Description goes here:
+Users can enter their details to log in to the service:
 
-![Put photos here](links_go_here)
+![Login Page](./assets/Screenshot%202025-02-06%20at%204.15.58%20PM.png)
 
-Description goes here:
+The landing page lets users either log in or sign up:
 
-![Put photos here](links_go_here)
+![Home Page](./assets/Screenshot%202025-02-06%20at%204.16.07%20PM.png)
 
-Description goes here:
+Our Mission Form lets users fill out the details of each mission, such as what went well, what can be improved, and who performed well during the mission/event:
 
-![Put photos here](links_go_here)
+![Mission Submission Form](./assets/Screenshot%202025-02-06%20at%204.16.18%20PM.png)
+
+At any time, users can look to the Navigation Panel to submit a new mission or review past missions:
+
+![Navigation Panel](./assets/Screenshot%202025-02-06%20at%204.23.59%20PM.png)
 
  ## Table of Contents
 
