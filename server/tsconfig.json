@@ -2,11 +2,13 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     /* Modules */
-    "rootDir": "src" /* Specify the root folder within your source files. */,
+    "rootDir": "src",
+    "baseUrl": "./src", /* Ensures imports work from src */
+    "moduleResolution": "NodeNext", /* Ensures Node.js-style module resolution */
+    "module": "NodeNext", /* Ensures module is set to NodeNext */
 
     /* Emit */
-    "outDir": "dist" /* Specify an output folder for all emitted files. */
-    // "noEmitOnError": true /* Disable emitting files if any type checking errors are reported. */
+    "outDir": "dist"
   },
   "include": ["src"],
   "typeRoots": ["./node_modules/@types", "./src/types"]

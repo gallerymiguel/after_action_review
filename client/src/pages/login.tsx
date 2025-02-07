@@ -1,84 +1,94 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Container, TextField, Button, Typography, Paper, Box, Grid } from '@mui/material';
+import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import  LOGIN_USER  from "../graphql/mutations";
+import { Container, TextField, Button, Typography, Paper, Box, Grid,} from "@mui/material";
 
 const LoginPage: React.FC = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const [formState, setFormState] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        console.log('Login attempt:', { username, password });
-    };
+  // ✅ Apollo Client mutation hook
+  const [loginUser, { loading }] = useMutation(LOGIN_USER);
 
-    return (
-        <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-            <Paper elevation={3} sx={{ padding: 3, width: '100%' }}>
-                <Box textAlign="center" mb={3}>
-                    <Typography variant="h4">Login</Typography>
-                </Box>
-                <form onSubmit={handleFormSubmit}>
-                    <Grid container spacing={3}> {/* Increased spacing from 2 to 3 */}
-                        
-                        {/* Username Field */}
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Username"
-                                variant="outlined"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        top: '-10px', 
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        padding: '10px', 
-                                    },
-                                }}
-                            />
-                        </Grid>
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({
+      ...formState,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-                        {/* Password Field */}
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Password"
-                                type="password"
-                                variant="outlined"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        top: '-10px',
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        padding: '10px',
-                                    },
-                                }}
-                            />
-                        </Grid>
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-                        {/* Submit Button */}
-                        <Grid item xs={12}>
-                            <Button type="submit" fullWidth variant="contained" color="primary">
-                                Login
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </form>
+    try {
+      const { data } = await loginUser({
+        variables: {
+          loginInput: {
+            email: formState.email,
+            password: formState.password,
+          },
+        },
+      });
 
-                {/* Link to Register Page */}
-                <Box textAlign="center" mt={2}>
-                    <Typography variant="body2">
-                        Don't have an account? <Link to="/register">Create Account</Link>
-                    </Typography>
-                </Box>
-            </Paper>
-        </Container>
-    );
+      // ✅ Store token in localStorage
+      localStorage.setItem("token", data.login.token);
+
+      // ✅ Redirect to home after successful login
+      navigate("/");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Incorrect email or password. Please try again.");
+    }
+  };
+
+  return (
+    <Container maxWidth="xs">
+      <Paper elevation={3} sx={{ padding: 3 }}>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h4">Login</Typography>
+        </Box>
+        <form onSubmit={handleFormSubmit}>
+          <Grid container spacing={3}>
+            {error && (
+              <Grid item xs={12}>
+                <Typography color="error">{error}</Typography>
+              </Grid>
+            )}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                variant="outlined"
+                value={formState.email}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type="password"
+                variant="outlined"
+                value={formState.password}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button type="submit" fullWidth variant="contained" color="primary">
+                {loading ? "Logging in..." : "Login"}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
+    </Container>
+  );
 };
 
 export default LoginPage;

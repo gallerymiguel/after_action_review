@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import App from "./App";
 import "./index.css";
 import HomePage from "./pages/landingpage";
@@ -10,6 +11,18 @@ import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 import MyReviews from "./pages/myreviews";
 
+// ✅ Create Apollo Client with correct URI
+const httpLink = createHttpLink({
+  uri: "http://localhost:3001/graphql", // Make sure this matches your server's GraphQL URL
+  credentials: "include", // If using authentication
+});
+
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+});
+
+// ✅ Define Routes
 const router = createBrowserRouter([
   {
     path: "/",
@@ -26,7 +39,9 @@ const router = createBrowserRouter([
   },
 ]);
 
-
+// ✅ Wrap the app with ApolloProvider
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={router} />
+  <ApolloProvider client={client}>
+    <RouterProvider router={router} />
+  </ApolloProvider>
 );

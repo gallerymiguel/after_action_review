@@ -5,18 +5,18 @@ const typeDefs = gql`
     EVALUATOR
     USER
   }
-  
+
   type User {
     _id: ID!
     username: String!
-    email: String
+    email: String!
     role: Role!
     unit: Unit
   }
 
   type Auth {
-    token: ID!
-    user: User
+    token: String!
+    user: User!
   }
 
   input RegisterInput {
@@ -73,7 +73,7 @@ const typeDefs = gql`
   }
 
   type Query {
-    me: User
+    me: User  # ✅ FIX: Changed from Auth to User
     users: [User]
     user(userId: ID!): User
     units: [Unit]!
