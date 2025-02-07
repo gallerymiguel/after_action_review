@@ -1,17 +1,11 @@
 import { gql } from 'graphql-tag';
 
 const typeDefs = gql`
-  enum Role {
-    EVALUATOR
-    USER
-  }
+  
   
   type User {
     _id: ID!
     username: String!
-    email: String
-    role: Role!
-    unit: Unit
   }
 
   type Auth {
@@ -21,14 +15,11 @@ const typeDefs = gql`
 
   input RegisterInput {
     username: String!
-    email: String!
     password: String!
-    role: Role = USER
-    unitId: ID
   }
 
   input LoginInput {
-    email: String!
+    username: String!
     password: String!
   }
 
@@ -74,8 +65,6 @@ const typeDefs = gql`
 
   type Query {
     me: User
-    users: [User]
-    user(userId: ID!): User
     units: [Unit]!
     unit(id: ID!): Unit
     missions: [Mission]!
