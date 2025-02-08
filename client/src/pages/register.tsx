@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { REGISTER_USER } from "../graphql/mutations";
-import { Container, TextField, Button, Typography, Paper, Box, Grid,} from "@mui/material";
+import { Container, TextField, Button, Typography, Paper, Box, Grid } from "@mui/material";
 
 const CreateAccountPage: React.FC = () => {
-  const navigate = useNavigate(); // ✅ Used for redirection after signup
+  const navigate = useNavigate();
   const [formState, setFormState] = useState({
     username: "",
     email: "",
@@ -46,10 +46,13 @@ const CreateAccountPage: React.FC = () => {
       // ✅ Store token in localStorage
       localStorage.setItem("token", data.register.token);
 
-      // ✅ Redirect to home after successful registration
-      navigate("/");
+      // ✅ Dispatch global auth event to update state in Navigation
+      window.dispatchEvent(new Event("authChange"));
+
+      // ✅ Redirect to /home after successful registration
+      navigate("/home");
     } catch (err) {
-      console.error("Registration error:", err);
+      console.error("❌ Registration error:", err);
       setError("Failed to register. Please try again.");
     }
   };
@@ -70,7 +73,6 @@ const CreateAccountPage: React.FC = () => {
         </Box>
         <form onSubmit={handleFormSubmit}>
           <Grid container spacing={3}>
-            {/* Username Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -83,7 +85,6 @@ const CreateAccountPage: React.FC = () => {
               />
             </Grid>
 
-            {/* Email Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -96,7 +97,6 @@ const CreateAccountPage: React.FC = () => {
               />
             </Grid>
 
-            {/* Password Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -110,7 +110,6 @@ const CreateAccountPage: React.FC = () => {
               />
             </Grid>
 
-            {/* Confirm Password Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -124,7 +123,6 @@ const CreateAccountPage: React.FC = () => {
               />
             </Grid>
 
-            {/* Submit Button */}
             <Grid item xs={12}>
               <Button type="submit" fullWidth variant="contained" color="primary">
                 {loading ? "Registering..." : "Register"}
