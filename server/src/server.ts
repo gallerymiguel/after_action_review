@@ -21,47 +21,54 @@ const server = new ApolloServer({
   resolvers,
 });
 
-// ✅ FIX: Context function properly extracts the token
+// ✅ Improved Context Function (Ensures proper user extraction)
 const contextFunction = async ({ req }: { req: Request }) => {
-  const user = authenticateToken(req); // Ensure this function returns `{ user }`
+  const { user } = authenticateToken({ req }); // Ensure this function returns `{ user }`
   return { user };
 };
 
 const startApolloServer = async () => {
-  await server.start();
-  await db();
+  try {
+    await server.start();
+    await db();
+    console.log("✅ Database connected successfully!");
 
-  const PORT = process.env.PORT || 3001;
-  const app = express();
+    const PORT = process.env.PORT || 3001;
+    const app = express();
 
-  // ✅ Fix CORS issue
-  app.use(cors({
-    origin: ['http://localhost:3000'], // Allow frontend requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  }));
+    // ✅ Enhanced CORS Configuration
+    const corsOptions = {
+      origin: ['http://localhost:3000', 'https://your-deployment-url.com'], // Update this with your client origin
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    };
 
-  app.options('*', cors()); // Handle preflight requests
+    app.use(cors(corsOptions));
+    app.options('*', cors(corsOptions)); // Handle preflight requests
 
-  app.use(express.urlencoded({ extended: false }));
-  app.use(express.json());
+    app.use(express.urlencoded({ extended: false }));
+    app.use(express.json());
 
-  // ✅ Ensure Apollo Server is properly configured with CORS
-  app.use('/graphql', expressMiddleware(server, { context: contextFunction }));
+    // ✅ Ensure Apollo Server is properly configured with context
+    app.use('/graphql', expressMiddleware(server, { context: contextFunction }));
 
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../../client/dist')));
+    if (process.env.NODE_ENV === 'production') {
+      app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-    app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+      app.get('*', (_req: Request, res: Response) => {
+        res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+      });
+    }
+
+    app.listen(PORT, () => {
+      console.log(`✅ API server running on port ${PORT}!`);
+      console.log(`🚀 Use GraphQL at http://localhost:${PORT}/graphql`);
     });
+  } catch (error) {
+    console.error("❌ Error starting server:", error);
+    process.exit(1); // Exit with failure
   }
-
-  app.listen(PORT, () => {
-    console.log(`✅ API server running on port ${PORT}!`);
-    console.log(`🚀 Use GraphQL at http://localhost:${PORT}/graphql`);
-  });
 };
 
 startApolloServer();

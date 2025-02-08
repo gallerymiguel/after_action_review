@@ -45,7 +45,7 @@ export const createUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User creation failed' });
     }
 
-    const token = signToken(user.username, user.email, user._id as string);
+    const token = signToken(user.username, user.email, user._id as string, user.role);
     return res.json({ token, user });
   } catch (error) {
     return res.status(500).json({ message: 'Server error', error: (error as Error).message });
@@ -66,7 +66,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Incorrect password' });
     }
 
-    const token = signToken(user.username, user.email, user._id as string);
+    const token = signToken(user.username, user.email, user._id as string, user.role);
     return res.json({ token, user });
   } catch (error) {
     return res.status(500).json({ message: 'Server error', error: (error as Error).message });

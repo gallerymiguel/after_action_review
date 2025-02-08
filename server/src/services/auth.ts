@@ -1,29 +1,44 @@
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-export const authenticateToken = ({ req }: any) => {
-  let token = req.body.token || req.query.token || req.headers.authorization;
+dotenv.config();
 
-  if (req.headers.authorization) {
-    token = token.split(' ').pop()?.trim();
-  }
+// ✅ Define User Payload Interface
+interface UserPayload {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+}
+
+// ✅ Define AuthenticatedRequest as a `Request` with a `user` field
+export interface AuthenticatedRequest extends Request {
+  user: UserPayload; // 👈 `user` must exist after authentication
+}
+
+// ✅ Middleware to Authenticate JWT Tokens
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+  let token = req.headers.authorization?.split(' ').pop()?.trim();
 
   if (!token) {
-    return req;
+    return res.status(401).json({ message: 'No token provided' });
   }
 
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
-    req.user = data;
-    return req;
-  } catch (err) {
-    console.log('Invalid token');
-    return req;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || '') as { data: UserPayload };
+
+    // ✅ Type Assertion to ensure `req` is treated as `AuthenticatedRequest`
+    (req as AuthenticatedRequest).user = decoded.data;
+
+    return next(); // ✅ Proceed to next middleware
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid token' });
   }
 };
 
-export const signToken = (username: string, email: string, _id: string) => {
-  const payload = { username, email, _id };
-  return jwt.sign({ data: payload }, process.env.JWT_SECRET_KEY || '', { expiresIn: '2hr' });
+// ✅ Function to Generate JWT Token
+export const signToken = (username: string, email: string, _id: string, role: string): string => {
+  const payload = { username, email, _id, role };
+  return jwt.sign({ data: payload }, process.env.JWT_SECRET_KEY || '', { expiresIn: '2h' });
 };
-
-export default signToken;
