@@ -50,7 +50,7 @@ const CreateAccountPage: React.FC = () => {
       window.dispatchEvent(new Event("authChange"));
 
       // ✅ Redirect to /home after successful registration
-      navigate("/home");
+      navigate("/");
     } catch (err) {
       console.error("❌ Registration error:", err);
       setError("Failed to register. Please try again.");
