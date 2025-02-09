@@ -44,8 +44,8 @@ const App: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          height: "100vh",
-          overflow: "hidden",
+          minHeight: "100vh", // ✅ minHeight instead of height
+          overflow: "auto", // ✅ allow scrolling
         }}
       >
         {/* Main Content Area */}

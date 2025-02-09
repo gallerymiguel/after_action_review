@@ -48,6 +48,8 @@ const NavigationBar: React.FC = () => {
     { text: "Home", icon: <Home />, path: "/" },
     { text: "New Review", icon: <RateReview />, path: "/review" },
     { text: "My Reviews", icon: <LibraryBooks />, path: "/myreviews" },
+    { text: "Login", icon: <Login />, path: "/login" }
+
   ];
 
   return (
