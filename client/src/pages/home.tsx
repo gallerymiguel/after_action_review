@@ -6,8 +6,9 @@ import { Container, Typography, CircularProgress, Button } from "@mui/material";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token"); // ✅ Retrieve token from localStorage
-  const [shouldRedirect, setShouldRedirect] = useState(false); // ✅ Track redirection
+  const token = localStorage.getItem("token");
+
+  console.log("🛠 Token Before Query:", token);
 
   const { loading, error, data } = useQuery(GET_ME, {
     context: {
@@ -15,25 +16,27 @@ const Home: React.FC = () => {
         Authorization: token ? `Bearer ${token}` : "",
       },
     },
-    skip: !token, // ✅ Skip query if no token exists
+    skip: !token,
   });
 
-  // ✅ Delay navigation until after first render
   useEffect(() => {
-    if (!token) {
-      console.warn("❌ No token found. Redirecting to login...");
-      setShouldRedirect(true); // ✅ Set state instead of navigating immediately
-    }
-  }, [token]);
+    console.log("📡 Fetching user data...");
+    console.log("🛠 Query Response:", { loading, error, data });
 
-  useEffect(() => {
-    if (shouldRedirect) {
-      navigate("/login"); // ✅ Navigate after rendering is done
+    if (!loading && (!data || !data.me)) {
+      console.warn("⚠️ User data is null. Redirecting...");
+      navigate("/login");
     }
-  }, [shouldRedirect, navigate]);
+  }, [loading, data, navigate]);
 
-  if (!token || shouldRedirect) {
-    return null; // ✅ Prevents rendering while redirecting
+  if (!token) {
+    return (
+      <Container maxWidth="md" sx={{ textAlign: "center", mt: 4 }}>
+        <Typography variant="h6" color="error">
+          No token found. Redirecting to login...
+        </Typography>
+      </Container>
+    );
   }
 
   if (loading) {
@@ -47,12 +50,12 @@ const Home: React.FC = () => {
     );
   }
 
-  if (error || !data?.me) {
+  if (error) {
     console.error("❌ Error fetching user data:", error);
     return (
       <Container maxWidth="md" sx={{ textAlign: "center", mt: 4 }}>
         <Typography variant="h6" color="error">
-          {error?.message === "❌ Not logged in"
+          {error.message.includes("Not logged in")
             ? "Session expired. Please log in again."
             : "An error occurred. Please try again."}
         </Typography>
@@ -68,11 +71,14 @@ const Home: React.FC = () => {
     );
   }
 
+  if (!data || !data.me) {
+    console.warn("⚠️ User data is null. Redirecting...");
+    return null;
+  }
+
   return (
     <Container maxWidth="md" sx={{ textAlign: "center", mt: 4 }}>
-      <Typography variant="h4">
-        Welcome, {data.me?.username || "User"}!
-      </Typography>
+      <Typography variant="h4">Welcome, {data.me.username}!</Typography>
       <Typography variant="body1" sx={{ mt: 2 }}>
         This is your home dashboard. Manage your missions and reviews here.
       </Typography>

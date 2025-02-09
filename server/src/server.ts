@@ -22,42 +22,39 @@ const server = new ApolloServer({
 });
 
 // ✅ **Improved Context Function**
-const contextFunction = async ({ req }: { req?: Request }) => {
+const contextFunction = async ({ req }: { req: Request }) => {
   if (!req) {
-    console.error("❌ Request object is missing.");
+    console.log("❌ No request object received.");
     return { user: null };
   }
 
   const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    console.log("⚠️ No Authorization header received.");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    console.warn("⚠️ No valid Authorization header received.");
     return { user: null };
   }
 
-  const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
-  if (!token) {
-    console.log("⚠️ No token found in Authorization header.");
-    return { user: null };
-  }
+  const token = authHeader.split(" ")[1];
 
   try {
-    const secretKey = process.env.JWT_SECRET_KEY || "";
-    if (!secretKey) throw new Error("Missing JWT_SECRET_KEY in environment variables.");
-
-    const decoded = jwt.verify(token, secretKey) as { data: JwtPayload };
-
-    if (!decoded || !decoded.data) {
-      console.log("⚠️ Token does not contain valid user data.");
+    const secretKey = process.env.JWT_SECRET_KEY;
+    if (!secretKey) {
+      console.error("❌ JWT_SECRET_KEY is missing in environment variables.");
       return { user: null };
     }
 
-    console.log("✅ Token verified successfully:", decoded.data);
-    return { user: decoded.data }; // ✅ Ensure `user` is correctly structured
+    console.log("🔑 Verifying token:", token);
+    const decoded = jwt.verify(token, secretKey) as { data: JwtPayload };
+    console.log("✅ Token verified successfully:", decoded);
+
+    return { user: decoded.data };
   } catch (err) {
     console.error("❌ Token verification failed:", (err as Error).message);
     return { user: null };
   }
 };
+
 
 const startApolloServer = async () => {
   try {

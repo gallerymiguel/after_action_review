@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
@@ -13,15 +14,17 @@ import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 import MyReviews from "./pages/myreviews";
 
-// ✅ Create Apollo Client with Authorization Headers
+// ✅ Apollo Client Setup
 const httpLink = createHttpLink({
   uri: "http://localhost:3001/graphql",
 });
 
-const authLink = setContext(() => {
+const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem("token");
+  console.log("🔑 Sending Token in Headers:", token);
   return {
     headers: {
+      ...headers,
       Authorization: token ? `Bearer ${token}` : "",
     },
   };
@@ -32,15 +35,31 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// ✅ Function to Check Authentication
+// ✅ Function to Check Authentication (Safe Outside of React Components)
 const isAuthenticated = () => !!localStorage.getItem("token");
 
-// ✅ Protected Route Component
+// ✅ Custom Hook to Track Authentication State
+const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  return isAuthenticated;
+};
+
+// ✅ Protected Route Component (Only Runs `isAuthenticated()` at Runtime)
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   return isAuthenticated() ? element : <Navigate to="/login" replace />;
 };
 
-// ✅ Define Routes
+// ✅ Define Routes (OUTSIDE of React Components)
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,7 +77,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-// ✅ Wrap the app with ApolloProvider
+// ✅ Wrap the App in ApolloProvider and Router
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ApolloProvider client={client}>
     <RouterProvider router={router} />
