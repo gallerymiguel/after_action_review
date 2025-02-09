@@ -6,6 +6,11 @@
   overflow-x: hidden; 
 }
 
+html, body {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-y: auto !important;
+}
 
 .logo {
   height: 6em;
