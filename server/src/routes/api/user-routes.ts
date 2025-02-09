@@ -1,20 +1,29 @@
 import express from 'express';
-const router= express.Router();
-import {
-    createUser,
-    getSingleUser,
-    newReport,
-    deleteReport,
-    login,
-} from '../../controllers/user-controller.js';
+import { Request, Response } from 'express';
+import { AuthenticatedRequest, authenticateToken } from '../../services/auth.js';
+import { createUser, getSingleUser, newReport, deleteReport, login } from '../../controllers/user-controller.js';
 
-//import middleware
-import {authenticateToken} from '../../services/auth';
+const router = express.Router();
 
-//put authMiddleware anywhere we need to send a token for verification of user
-router.route('/').post(createUser).put(authenticateToken, newReport);
-router.route('/login').post(login);
-router.route('/me').get(authenticateToken, getSingleUser);
-router.route('/reports/:reportId').delete(authenticateToken, deleteReport);
+// ✅ Public Routes (No Authentication Required)
+router.post('/register', createUser);
+router.post('/login', login);
+
+// ✅ Protected Routes (Require Authentication)
+router.get('/me', authenticateToken, async (req: Request, res: Response) => {
+  // Explicitly cast `req` to `AuthenticatedRequest`
+  const authReq = req as AuthenticatedRequest;
+  return getSingleUser(authReq, res);
+});
+
+router.put('/report', authenticateToken, async (req: Request, res: Response) => {
+  const authReq = req as AuthenticatedRequest;
+  return newReport(authReq, res);
+});
+
+router.delete('/reports/:reportId', authenticateToken, async (req: Request, res: Response) => {
+  const authReq = req as AuthenticatedRequest;
+  return deleteReport(authReq, res);
+});
 
 export default router;

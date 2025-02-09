@@ -1,123 +1,147 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Container, TextField, Button, Typography, Paper, Box, Grid } from '@mui/material';
+import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import { REGISTER_USER } from "../graphql/mutations";
+import { Container, TextField, Button, Typography, Paper, Box, Grid } from "@mui/material";
 
 const CreateAccountPage: React.FC = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [formState, setFormState] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
 
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+  // ✅ Apollo Client mutation hook
+  const [registerUser, { loading }] = useMutation(REGISTER_USER);
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({
+      ...formState,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-        console.log('Account created:', { username, password });
-        // api calls here !!!
-    };
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    return (
-        <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-            <Paper elevation={3} sx={{ padding: 3, width: '100%' }}>
-                <Box textAlign="center" mb={3}>
-                    <Typography variant="h4">Create Account</Typography>
-                </Box>
-                <form onSubmit={handleFormSubmit}>
-                    <Grid container spacing={3}> {/* Increased spacing here from 2 to 3 */}
-                        
-                        {/* Username Field */}
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Username"
-                                variant="outlined"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        top: '-10px', 
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        padding: '10px', 
-                                    },
-                                }}
-                            />
-                        </Grid>
+    if (formState.password !== formState.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-                        {/* Password Field */}
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Password"
-                                type="password"
-                                variant="outlined"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        top: '-10px',
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        padding: '10px',
-                                    },
-                                }}
-                            />
-                        </Grid>
+    try {
+      const { data } = await registerUser({
+        variables: {
+          registerInput: {
+            username: formState.username,
+            email: formState.email,
+            password: formState.password,
+          },
+        },
+      });
 
-                        {/* Confirm Password Field */}
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Confirm Password"
-                                type="password"
-                                variant="outlined"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                                sx={{
-                                    '& .MuiInputLabel-root': {
-                                        top: '-10px',
-                                    },
-                                    '& .MuiOutlinedInput-root': {
-                                        padding: '10px',
-                                    },
-                                }}
-                            />
-                        </Grid>
+      // ✅ Store token in localStorage
+      localStorage.setItem("token", data.register.token);
 
-                        {/* Submit Button */}
-                        <Grid item xs={12}>
-                            <Button type="submit" fullWidth variant="contained" color="primary">
-                                Register
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </form>
+      // ✅ Dispatch global auth event to update state in Navigation
+      window.dispatchEvent(new Event("authChange"));
 
-                {/* Error message */}
-                {error && (
-                    <Box textAlign="center" mt={2}>
-                        <Typography variant="body2" color="error">
-                            {error}
-                        </Typography>
-                    </Box>
-                )}
+      // ✅ Redirect to /home after successful registration
+      navigate("/home");
+    } catch (err) {
+      console.error("❌ Registration error:", err);
+      setError("Failed to register. Please try again.");
+    }
+  };
 
-                {/* Link to Login page */}
-                <Box textAlign="center" mt={2}>
-                    <Typography variant="body2">
-                        Already have an account? <Link to="/login">Login</Link>
-                    </Typography>
-                </Box>
-            </Paper>
-        </Container>
-    );
+  return (
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh",
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 3, width: "100%" }}>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h4">Create Account</Typography>
+        </Box>
+        <form onSubmit={handleFormSubmit}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Username"
+                name="username"
+                variant="outlined"
+                value={formState.username}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                variant="outlined"
+                value={formState.email}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type="password"
+                variant="outlined"
+                value={formState.password}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                variant="outlined"
+                value={formState.confirmPassword}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Button type="submit" fullWidth variant="contained" color="primary">
+                {loading ? "Registering..." : "Register"}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+
+        {/* Error message */}
+        {error && (
+          <Box textAlign="center" mt={2}>
+            <Typography variant="body2" color="error">
+              {error}
+            </Typography>
+          </Box>
+        )}
+      </Paper>
+    </Container>
+  );
 };
 
 export default CreateAccountPage;
