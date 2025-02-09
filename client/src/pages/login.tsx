@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
       if (data && data.login.token) {
         console.log("✅ Token received:", data.login.token);
         localStorage.setItem("token", data.login.token); // ✅ Store token
-        navigate("/home"); // ✅ Redirect to home
+        navigate("/"); // ✅ Redirect to home
       } else {
         setError("❌ Login failed. No token received.");
       }

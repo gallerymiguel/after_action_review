@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import Home from "./pages/home";
-import LandingPage from "./pages/landingpage";
+import LandingPage from "./pages/landingpage"; // ✅ Landing page for all users
 import ErrorPage from "./pages/error";
 import LoginPage from "./pages/login";
 import CreateAccountPage from "./pages/register";
@@ -14,17 +12,15 @@ import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 import MyReviews from "./pages/myreviews";
 
-// ✅ Apollo Client Setup
+// ✅ Create Apollo Client with Authorization Headers
 const httpLink = createHttpLink({
   uri: "http://localhost:3001/graphql",
 });
 
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext(() => {
   const token = localStorage.getItem("token");
-  console.log("🔑 Sending Token in Headers:", token);
   return {
     headers: {
-      ...headers,
       Authorization: token ? `Bearer ${token}` : "",
     },
   };
@@ -35,39 +31,22 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// ✅ Function to Check Authentication (Safe Outside of React Components)
+// ✅ Function to Check Authentication
 const isAuthenticated = () => !!localStorage.getItem("token");
 
-// ✅ Custom Hook to Track Authentication State
-const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem("token"));
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  return isAuthenticated;
-};
-
-// ✅ Protected Route Component (Only Runs `isAuthenticated()` at Runtime)
+// ✅ Protected Route Component
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
-  return isAuthenticated() ? element : <Navigate to="/login" replace />;
+  return isAuthenticated() ? element : <Navigate to="/" replace />; // ✅ Redirects to Landing Page
 };
 
-// ✅ Define Routes (OUTSIDE of React Components)
+// ✅ Define Routes (Removed `/home`)
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: isAuthenticated() ? <Navigate to="/home" replace /> : <LandingPage /> },
-      { path: "home", element: <ProtectedRoute element={<Home />} /> },
+      { index: true, element: <LandingPage /> }, // ✅ Landing page is the default
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
       { path: "review", element: <ProtectedRoute element={<MissionForm />} /> },
@@ -77,7 +56,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-// ✅ Wrap the App in ApolloProvider and Router
+// ✅ Wrap the app with ApolloProvider
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ApolloProvider client={client}>
     <RouterProvider router={router} />
