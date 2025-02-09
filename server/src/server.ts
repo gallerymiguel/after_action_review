@@ -85,6 +85,7 @@ const startApolloServer = async () => {
     // ✅ **Serve Client in Production**
     if (process.env.NODE_ENV === 'production') {
       const clientPath = path.join(__dirname, '../../client/dist');
+      console.log(`📂 Serving client from: ${clientPath}`);
       app.use(express.static(clientPath));
 
       app.get('*', (_req: Request, res: Response) => {
