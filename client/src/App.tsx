@@ -7,7 +7,7 @@ import "./App.css";
 
 // Create HTTP link for Apollo Client
 const httpLink = createHttpLink({
-  uri: "http://localhost:3001/graphql", // Ensure this matches your backend URL
+  uri: process.env.REACT_APP_API_URL || "http://localhost:3001/graphql", // Ensure this matches your backend URL
   credentials: "include", // Allows cookies and authorization headers
 });
 
