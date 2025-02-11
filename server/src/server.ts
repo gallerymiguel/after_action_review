@@ -1,29 +1,33 @@
 import express from 'express';
-import path from 'node:path';
+import path from 'path';
 import type { Request, Response } from 'express';
 import db from './config/connection.js';
 import { ApolloServer } from '@apollo/server';// Note: Import from @apollo/server-express
 import { expressMiddleware } from '@apollo/server/express4';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'url';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './utils/auth.js';
+import cors from 'cors';
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+
+const app = express();
 
 const server = new ApolloServer({
   typeDefs,
   resolvers
 });
 
+app.use(
+  cors({ 
+  origin: ["http://localhost:3000", "http://localhost:3001/graphql", "http://localhost:3000/register", "http://localhost:3000/"],
+  methods: ["GET", "POST", "PUT", "DELETE"]
+}));
+
 const startApolloServer = async () => {
   await server.start();
   await db();
 
   const PORT = process.env.PORT || 3001;
-  const app = express();
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
@@ -34,10 +38,16 @@ const startApolloServer = async () => {
     }
   ));
 
+  app.use(
+    cors({ 
+    origin: ["http://localhost:3000", "http://localhost:3001/graphql", "http://localhost:3000/register", "http://localhost:3000/", "/register", "/", "http://localhost:3000/login", "/login", "/graphql"],
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }));
+
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-    app.get('*', (_req: Request, res: Response) => {
+    app.get('/', (_req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
     });
   }

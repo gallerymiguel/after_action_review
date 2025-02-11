@@ -80,20 +80,22 @@ export const resolvers = {
       return { token, user: await user.populate('unit') };
     },
 
-    login: async (_: any, { loginInput }: { loginInput: { email: string; password: string } }) => {
+    login: async (_parent: any, { loginInput }: { loginInput: { email: string; password: string } }) => {
       const user = await User.findOne({ email: loginInput.email });
       
       if (!user) {
-        throw new AuthenticationError('No user found with this email address');
+        throw new AuthenticationError("User not found");
       }
-
+  
       const correctPw = await user.isCorrectPassword(loginInput.password);
-
+      
       if (!correctPw) {
-        throw new AuthenticationError('Incorrect credentials');
+        throw new AuthenticationError("Wrong password.");
       }
-
+  
       const token = signToken(user.username, user.email, user._id, user.role);
+      console.log("🔑 Token Sent to Client:", token); // Debugging
+  
       return { token, user };
     },
 
