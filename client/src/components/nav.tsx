@@ -49,7 +49,7 @@ const NavigationBar: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" color="primary">
+    <AppBar position="fixed" color="primary" sx={{ zIndex: 1301 }}>
       <Container maxWidth="lg">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           {/* Title */}

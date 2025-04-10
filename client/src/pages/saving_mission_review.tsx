@@ -111,7 +111,7 @@ const ReviewPage = () => {
 
           {/* Events Section */}
           {events && events.length > 0 ? (
-            events.map((event, index) => (
+            events.map((event: any, index: number) => (
               <Box
                 key={index}
                 sx={{
@@ -128,7 +128,7 @@ const ReviewPage = () => {
                 {event.sustainDetails && event.sustainDetails.length > 0 && (
                   <Box sx={{ mt: 1 }}>
                     <Typography variant="h6">Sustain Details:</Typography>
-                    {event.sustainDetails.map((sustain, i) => (
+                    {event.sustainDetails.map((sustain: string, i: number) => (
                       <Typography key={i}>- {sustain}</Typography>
                     ))}
                   </Box>
@@ -139,7 +139,7 @@ const ReviewPage = () => {
                   event.improveDetailsArray.length > 0 && (
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="h6">Improvements:</Typography>
-                      {event.improveDetailsArray.map((improve, i) => (
+                      {event.improveDetailsArray.map((improve: any, i: number) => (
                         <Box
                           key={i}
                           sx={{

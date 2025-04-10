@@ -48,8 +48,6 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  console.log("🔍 Sending Login Input:", { loginInput: { email, password } });
-
 
   return (
     <Container
