@@ -2,25 +2,19 @@ import dotenv from 'dotenv';
 dotenv.config();
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI= process.env.MONGODB_URI || '';
 
-if (!MONGODB_URI) {
-    console.error('❌ No MongoDB connection string found. Ensure MONGODB_URI is set.');
-    process.exit(1);
-}
-
-const connectDB = async (): Promise<void> => {
+const db= async (): Promise<typeof mongoose.connection> => {
     try {
-        await mongoose.connect(MONGODB_URI); // No extra options needed in Mongoose 7+
-
-        console.log('✅ Database connected successfully!');
-    } catch (error) {
-        console.error('❌ Database connection failed:', error);
-        process.exit(1);
+        await mongoose.connect(MONGODB_URI);
+        console.log('Database connected! Yay!');
+        return mongoose.connection;
     }
+    catch (error) {
+        console.error('There was an issue connecting to database:', error);
+        throw new Error('Database connection failed.');
+    }
+
 };
 
-// Immediately connect
-connectDB();
-
-export default mongoose.connection;
+export default db;
