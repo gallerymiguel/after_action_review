@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
 import Auth from "../utils/auth"; // Import Auth to get user info
 
 const Home: React.FC = () => {
-  const user = Auth.loggedIn() ? Auth.getProfile() : null; // Get logged-in user
-
+  // const user = Auth.loggedIn() ? Auth.getProfile() : null; // Get logged-in user
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    if (Auth.loggedIn()) {
+      const profile = Auth.getProfile();
+      setUser(profile);
+    }
+  }, []);
+  
+  
   return (
     <Container maxWidth="md" className="home-container">
       <Box textAlign="center" mt={5}>
