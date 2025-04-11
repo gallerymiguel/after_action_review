@@ -3,7 +3,7 @@ import { CssBaseline, Box, Container } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import NavigationBar from "./components/nav";
 import "./App.css";
-
+import Footer from "./components/footer";
 
 // Debug Component to Log Current Location
 const DebugLocation: React.FC = () => {
@@ -22,22 +22,22 @@ const App: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           height: "100vh", // Limit total height to prevent scrolling
-          overflow: "hidden", // Prevents unnecessary scrollbars
+          // overflow: "hidden",
         }}
       >
         {/* Main Content Area */}
         <Container
-          maxWidth={false} 
+          maxWidth={false}
           sx={{
-            width: "100vw", 
-            maxWidth: "100%", 
+            width: "100vw",
+            maxWidth: "100%",
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            px: 0, 
+            px: 0,
           }}
         >
           <DebugLocation />
@@ -45,17 +45,7 @@ const App: React.FC = () => {
         </Container>
 
         {/* Footer at the bottom */}
-        <Box
-          component="footer"
-          sx={{
-            width: "100vw",
-            backgroundColor: "#f5f5f5",
-            py: 2, 
-            textAlign: "center",
-          }}
-        >
-          <Container maxWidth="lg">© {new Date().getFullYear()} AAR Platform</Container>
-        </Box>
+        <Footer />
       </Box>
     </>
   );

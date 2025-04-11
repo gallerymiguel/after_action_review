@@ -11,6 +11,7 @@ import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 import MyReviews from "./pages/myreviews";
 import Auth from "./utils/auth"; // Import auth to check login status
+import LandingPage from "./pages/landingpage";
 
 // Apollo Client Setup
 const httpLink = createHttpLink({
@@ -32,8 +33,8 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: isLoggedIn ? <Navigate to="/home" replace /> : <HomePage /> }, // Redirect to home if logged in
-      { path: "home", element: <HomePage /> }, // Separate page for logged-in users
+      { index: true, element: isLoggedIn ? <Navigate to="/landingpage" replace /> : <HomePage /> },
+      { path: "landingpage", element: <LandingPage /> }, // Separate page for logged-in users
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
       { path: "review", element: <MissionForm /> },

@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material";
 
 const LandingPage: React.FC = () => {
@@ -7,21 +7,22 @@ const LandingPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Container
-      maxWidth="md"
-      className="home-container"
+    <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
         justifyContent: "center",
-        height: "100vh",
+        alignItems: "center",
+        minHeight: "calc(100vh - 64px)", // Leave room for the footer (adjust height as needed)
+        marginLeft: 40,
+        marginRight: 40,
+        paddingBottom: 4,
         textAlign: "center",
-        px: isMobile ? 2 : 4, 
+        px: isMobile ? 2 : 4,
       }}
     >
       <Typography
-        variant={isMobile ? "h4" : "h2"} 
+        variant={isMobile ? "h4" : "h2"}
         gutterBottom
         sx={{ fontWeight: "bold", mb: 2 }}
       >
@@ -29,10 +30,10 @@ const LandingPage: React.FC = () => {
       </Typography>
 
       <Typography
-        variant="h6" 
+        variant="h6"
         color="textSecondary"
         paragraph
-        sx={{ maxWidth: "600px" }} 
+        sx={{ maxWidth: "600px" }}
       >
         A structured process to analyze what happened, why it happened, and how it can be improved.
       </Typography>
@@ -54,7 +55,7 @@ const LandingPage: React.FC = () => {
       >
         Get Started
       </Button>
-    </Container>
+    </Box>
   );
 };
 
