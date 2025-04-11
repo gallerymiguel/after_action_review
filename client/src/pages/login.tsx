@@ -1,67 +1,130 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import { LOGIN_USER } from "../graphql/mutations";
-import { Container, TextField, Button, Typography, Paper, Box, Grid } from "@mui/material";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Box,
+  Grid,
+} from "@mui/material";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../utils/mutations";
+import Auth from "../utils/auth";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const [formState, setFormState] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loginUser, { loading }] = useMutation(LOGIN_USER);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
+  
+  const [login, { error: mutationError }] = useMutation(LOGIN_USER);
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+  
     try {
-      const { data } = await loginUser({
-        variables: { loginInput: formState },
+      const { data } = await login({
+        variables: {
+          loginInput: { email, password },
+        },
       });
-
-      if (data && data.login.token) {
-        console.log("✅ Token received:", data.login.token);
-        localStorage.setItem("token", data.login.token); // ✅ Store token
-        navigate("/"); // ✅ Redirect to home
+  
+      console.log("🔍 Full Response from GraphQL:", data);
+  
+      if (data && data.login && data.login.token) {
+        console.log("✅ Login Successful. Token:", data.login.token);
+        Auth.login(data.login.token);
+        navigate("/");
       } else {
-        setError("❌ Login failed. No token received.");
+        console.error("❌ No Token Returned from Server");
+        setError("Login failed. No token received.");
       }
     } catch (err) {
       console.error("❌ Login Error:", err);
-      setError("Invalid credentials. Please try again.");
+      setError("Login failed. Check your credentials.");
     }
   };
 
+
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={3} sx={{ padding: 3 }}>
-        <Typography variant="h4" textAlign="center" mb={3}>Login</Typography>
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh",
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 3, width: "100%" }}>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h4">Login</Typography>
+        </Box>
         <form onSubmit={handleFormSubmit}>
           <Grid container spacing={3}>
+            {/* Email Field */}
             <Grid item xs={12}>
-              <TextField fullWidth label="Email" name="email" variant="outlined" value={formState.email} onChange={handleInputChange} required />
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </Grid>
+
+            {/* Password Field */}
             <Grid item xs={12}>
-              <TextField fullWidth label="Password" name="password" type="password" variant="outlined" value={formState.password} onChange={handleInputChange} required />
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                variant="outlined"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </Grid>
+
+            {/* Submit Button */}
             <Grid item xs={12}>
-              <Button type="submit" fullWidth variant="contained" color="primary">
-                {loading ? "Logging in..." : "Login"}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Login
               </Button>
             </Grid>
           </Grid>
         </form>
-        {error && (
-          <Typography variant="body2" color="error" textAlign="center" mt={2}>
-            {error}
-          </Typography>
+
+        {/* Error Message */}
+        {mutationError && (
+          <Box textAlign="center" mt={2}>
+            <Typography variant="body2" color="error">
+              {mutationError.message}
+            </Typography>
+          </Box>
         )}
+
+        {/* Show Custom Error */}
+        {error && (
+          <Box textAlign="center" mt={2}>
+            <Typography variant="body2" color="error">
+              {error}
+            </Typography>
+          </Box>
+        )}
+        {/* Link to Signup Page */}
         <Box textAlign="center" mt={2}>
           <Typography variant="body2">
-            Don't have an account? <Link to="/register">Create Account</Link>
+            Don't have an account? <Link to="/register">Sign up</Link>
           </Typography>
         </Box>
       </Paper>
