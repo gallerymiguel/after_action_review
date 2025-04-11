@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import NavigationBar from "../components/nav"; // Adjust the path if needed
 
 // Define types for mission details and event entries
 interface MissionDetails {
@@ -125,24 +126,6 @@ const MissionForm: React.FC = () => {
     }
   };
 
-  // Handles changes to improvement details
-  const handleImproveDetailsChange =
-    (index: number, field: keyof EventEntry["improveDetails"][0]) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (currentEvent.type === "improve") {
-        const updatedImprovements = [...(currentEvent.improveDetails || [])];
-        updatedImprovements[index] = {
-          ...updatedImprovements[index],
-          [field]: e.target.value,
-        };
-
-        setCurrentEvent({
-          ...currentEvent,
-          improveDetails: updatedImprovements,
-        });
-      }
-    };
-
   // Handles changes to sustain details
   const handleSustainChange = (index: number, value: string) => {
     if (currentEvent.type === "sustain") {
@@ -245,27 +228,23 @@ const MissionForm: React.FC = () => {
     navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
   };
 
-
-  const formatLabel = (key: string) => {
-    const labelMap: { [key: string]: string } = {
-      observation: "Observation",
-      howToFix: "How to Fix",
-      whoWillFix: "Who Will Fix It",
-      whenWillFix: "When Will It Be Fixed",
-    };
-    return labelMap[key] || key; // Default to original key if not found
-  };
+  console.log("✅ NavigationBar Loaded");
 
   return (
+    <>
+      {/* ✅ Navigation Bar Added */}
+      <NavigationBar />
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
+        minHeight: "100vh",
         width: "100vw",
         position: "absolute",
-        top: 0,
+        paddingTop: 10,
+        paddingBottom: 10,
+        top: 10,
         left: 0,
         backgroundColor: "#f5f5f5",
       }}
@@ -600,6 +579,7 @@ const MissionForm: React.FC = () => {
 
       </Container>
     </Box>
+    </>
   );
 };
 
