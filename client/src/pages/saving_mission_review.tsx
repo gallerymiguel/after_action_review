@@ -1,16 +1,30 @@
 import React, { useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Container, Typography, Box, Button } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useQuery } from "@apollo/client";
+import { GET_SINGLE_MISSION } from "../utils/queries"; // adjust path if needed
 
 const ReviewPage = () => {
-  const location = useLocation();
+  const { id } = useParams(); // This gives you the mission ID from the URL
   const navigate = useNavigate();
   const reviewRef = useRef<HTMLDivElement>(null);
+  const { loading, error, data } = useQuery(GET_SINGLE_MISSION, {
+    variables: { id },
+  });
+
+  if (loading) return <Typography>Loading mission...</Typography>;
+  if (error)
+    return <Typography color="error">Failed to load mission.</Typography>;
+
+  const missionData = data?.mission;
 
   // Retrieve state data safely
-  const { mission, events, summary, hero } = location.state || {};
+  const mission = missionData;
+  const events = missionData?.events || [];
+  const summary = missionData?.summary || "";
+  const hero = missionData?.hero || "";
 
   const handleDownloadPDF = async () => {
     if (!reviewRef.current) return;
@@ -97,11 +111,10 @@ const ReviewPage = () => {
                 <strong>Mission Date:</strong>{" "}
                 {mission.missionDate
                   ? new Date(mission.missionDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric"
-                  })
-                  
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
                   : "No date provided"}
               </Typography>
 

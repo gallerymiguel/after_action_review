@@ -32,6 +32,7 @@ export const resolvers = {
       }
       return await User.findById(userId).populate('unit');
     },
+
     units: async (_: any, __: any, context: Context) => {
       if (!context.user) {
         throw new AuthenticationError('Must be logged in');
@@ -45,6 +46,13 @@ export const resolvers = {
       }
       return await Unit.findById(id).populate('missions');
     },
+
+    userMissions: async (_: any, __: any, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError("Not logged in");
+      }
+      return await Mission.find({ user: context.user._id }).sort({ createdAt: -1 });
+    },
     
     missions: async (_: any, __: any, context: Context) => {
       if (!context.user) {
@@ -57,7 +65,8 @@ export const resolvers = {
       if (!context.user) {
         throw new AuthenticationError('Must be logged in');
       }
-      return await Mission.findById(id).populate('unit');
+      return await Mission.findById(id)
+      // .populate('unit');
     },
     
     missionsByUnit: async (_: any, { unitId }: { unitId: string }, context: Context) => {
@@ -99,66 +108,84 @@ export const resolvers = {
       return { token, user };
     },
 
-    createUnit: async (_: any, { input }: { input: { name: string } }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to create units');
-      }
-      return await Unit.create(input);
-    },
+    // createUnit: async (_: any, { input }: { input: { name: string } }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to create units');
+    //   }
+    //   return await Unit.create(input);
+    // },
     
-    updateUnit: async (_: any, { id, input }: { id: string, input: { name?: string } }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to update units');
-      }
-      return await Unit.findByIdAndUpdate(id, input, { new: true, runValidators: true });
-    },
+    // updateUnit: async (_: any, { id, input }: { id: string, input: { name?: string } }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to update units');
+    //   }
+    //   return await Unit.findByIdAndUpdate(id, input, { new: true, runValidators: true });
+    // },
     
-    deleteUnit: async (_: any, { id }: { id: string }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to delete units');
-      }
-      const unit = await Unit.findByIdAndDelete(id);
-      if (unit) {
-        // Delete all missions associated with this unit
-        await Mission.deleteMany({ unit: id });
-      }
-      return unit;
-    },
+    // deleteUnit: async (_: any, { id }: { id: string }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to delete units');
+    //   }
+    //   const unit = await Unit.findByIdAndDelete(id);
+    //   if (unit) {
+    //     // Delete all missions associated with this unit
+    //     await Mission.deleteMany({ unit: id });
+    //   }
+    //   return unit;
+    // },
     
-    createMission: async (_: any, { input }: { input: { name: string, startDate: string, endDate: string, unitId: string } }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to create missions');
-      }
-      const mission = await Mission.create({
-        ...input,
-        unit: input.unitId
-      });
-      await Unit.findByIdAndUpdate(input.unitId, {
-        $push: { missions: mission._id }
-      });
-      return mission.populate('unit');
-    },
+    // createMission: async (_: any, { input }: { input: { name: string, startDate: string, endDate: string, unitId: string } }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to create missions');
+    //   }
+    //   const mission = await Mission.create({
+    //     ...input,
+    //     unit: input.unitId
+    //   });
+    //   await Unit.findByIdAndUpdate(input.unitId, {
+    //     $push: { missions: mission._id }
+    //   });
+    //   return mission.populate('unit');
+    // },
     
-    updateMission: async (_: any, { id, input }: { id: string, input: { name?: string, startDate?: string, endDate?: string, unitId?: string } }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to update missions');
-      }
-      return await Mission.findByIdAndUpdate(id, input, { new: true, runValidators: true }).populate('unit');
-    },
+    // updateMission: async (_: any, { id, input }: { id: string, input: { name?: string, startDate?: string, endDate?: string, unitId?: string } }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to update missions');
+    //   }
+    //   return await Mission.findByIdAndUpdate(id, input, { new: true, runValidators: true }).populate('unit');
+    // },
     
-    deleteMission: async (_: any, { id }: { id: string }, context: Context) => {
-      if (!context.user || context.user.role !== UserRole.EVALUATOR) {
-        throw new AuthenticationError('Must be an Evaluator to delete missions');
+    // deleteMission: async (_: any, { id }: { id: string }, context: Context) => {
+    //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
+    //     throw new AuthenticationError('Must be an Evaluator to delete missions');
+    //   }
+    //   const mission = await Mission.findById(id);
+    //   if (mission) {
+    //     await Unit.findByIdAndUpdate(mission.unit, {
+    //       $pull: { missions: id }
+    //     });
+    //     return await Mission.findByIdAndDelete(id);
+    //   }
+    //   return null;
+    // },
+    saveMission: async (_: any, { input }: { input: any }, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You must be logged in to save a mission');
       }
-      const mission = await Mission.findById(id);
-      if (mission) {
-        await Unit.findByIdAndUpdate(mission.unit, {
-          $pull: { missions: id }
+    
+      try {
+        const newMission = await Mission.create({
+          ...input,
+          user: context.user._id,
         });
-        return await Mission.findByIdAndDelete(id);
+    
+        return newMission;
+      } catch (err) {
+        console.error("❌ Error saving mission:", err);
+        throw new Error("Failed to save mission");
       }
-      return null;
     }
+    
   }
 };
 
