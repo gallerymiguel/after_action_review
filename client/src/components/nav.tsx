@@ -35,7 +35,7 @@ const NavigationBar: React.FC = () => {
 
   // Define menu items
   const menuItems = [
-    { text: "Home", icon: <Home />, path: "/" },
+    { text: "Home", icon: <Home />, path: "/home" },
     { text: "New Review", icon: <RateReview />, path: "/review" },
     { text: "My Reviews", icon: <LibraryBooks />, path: "/myreviews" },
     isLoggedIn

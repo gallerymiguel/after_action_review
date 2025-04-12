@@ -1,12 +1,6 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
-  Paper,
-} from "@mui/material";
+import { Container, Typography, Box, Button } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -58,7 +52,7 @@ const ReviewPage = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "calc(100vh - 64px)",
         width: "100vw",
         backgroundColor: "#f5f5f5",
         padding: 4,
@@ -73,6 +67,7 @@ const ReviewPage = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          margin: "50px auto",
         }}
       >
         {/* SINGLE BORDER AROUND REVIEW SECTION */}
@@ -99,8 +94,17 @@ const ReviewPage = () => {
                 <strong>Mission Name:</strong> {mission.missionName}
               </Typography>
               <Typography variant="h6">
-                <strong>Mission Date:</strong> {mission.missionDate?.toString()}
+                <strong>Mission Date:</strong>{" "}
+                {mission.missionDate
+                  ? new Date(mission.missionDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                  })
+                  
+                  : "No date provided"}
               </Typography>
+
               <Typography variant="h6">
                 <strong>Mission Unit:</strong> {mission.missionUnit}
               </Typography>
@@ -139,29 +143,34 @@ const ReviewPage = () => {
                   event.improveDetailsArray.length > 0 && (
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="h6">Improvements:</Typography>
-                      {event.improveDetailsArray.map((improve: any, i: number) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            mt: 1,
-                            p: 1,
-                            borderBottom: "1px solid lightgray",
-                          }}
-                        >
-                          <Typography>
-                            <strong>Observation:</strong> {improve.observation}
-                          </Typography>
-                          <Typography>
-                            <strong>How to Fix:</strong> {improve.howToFix}
-                          </Typography>
-                          <Typography>
-                            <strong>Who Will Fix:</strong> {improve.whoWillFix}
-                          </Typography>
-                          <Typography>
-                            <strong>When Will Fix:</strong> {improve.whenWillFix}
-                          </Typography>
-                        </Box>
-                      ))}
+                      {event.improveDetailsArray.map(
+                        (improve: any, i: number) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              mt: 1,
+                              p: 1,
+                              borderBottom: "1px solid lightgray",
+                            }}
+                          >
+                            <Typography>
+                              <strong>Observation:</strong>{" "}
+                              {improve.observation}
+                            </Typography>
+                            <Typography>
+                              <strong>How to Fix:</strong> {improve.howToFix}
+                            </Typography>
+                            <Typography>
+                              <strong>Who Will Fix:</strong>{" "}
+                              {improve.whoWillFix}
+                            </Typography>
+                            <Typography>
+                              <strong>When Will Fix:</strong>{" "}
+                              {improve.whenWillFix}
+                            </Typography>
+                          </Box>
+                        )
+                      )}
                     </Box>
                   )}
               </Box>

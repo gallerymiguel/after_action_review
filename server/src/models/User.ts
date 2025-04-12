@@ -1,5 +1,5 @@
 import { Schema, model, type Document } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 // import reportSchema from './Report.js';
 // import type { ReportDocument } from './Report.js'
 import type { UnitDocument } from './Unit.js';
