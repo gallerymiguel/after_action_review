@@ -60,3 +60,12 @@ export const SAVE_MISSION = gql`
     }
   }
 `;
+
+export const DELETE_MISSION = gql`
+  mutation DeleteMission($id: ID!) {
+    deleteMission(id: $id) {
+      _id
+      missionName
+    }
+  }
+`;

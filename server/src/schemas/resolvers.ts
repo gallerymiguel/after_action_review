@@ -107,7 +107,21 @@ export const resolvers = {
   
       return { token, user };
     },
-
+    
+    deleteMission: async (_: any, { id }: { id: string }, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError("Must be logged in to delete");
+      }
+    
+      const mission = await Mission.findOne({ _id: id, user: context.user._id });
+      if (!mission) {
+        throw new Error("Mission not found or unauthorized");
+      }
+    
+      await Mission.findByIdAndDelete(id);
+      return mission;
+    }
+    
     // createUnit: async (_: any, { input }: { input: { name: string } }, context: Context) => {
     //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
     //     throw new AuthenticationError('Must be an Evaluator to create units');

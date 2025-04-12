@@ -244,11 +244,15 @@ const MissionForm: React.FC = () => {
       });
   
       console.log("✅ Mission saved to backend:", data);
-  
+      const newMissionId = data?.saveMission?._id;
+      
       // 2. Navigate to review screen like before
-      navigate("/save_mission", {
-        state: { mission, events: [...events], summary, hero },
-      });
+      if (newMissionId) {
+        alert("✅ Mission saved! Redirecting...");
+        navigate(`/mission/${newMissionId}`);
+      } else {
+        alert("❌ Mission saved but could not retrieve ID.");
+      }
     } catch (err) {
       console.error("❌ Error saving mission:", err);
       alert("An error occurred while saving the mission.");

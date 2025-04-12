@@ -44,7 +44,7 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: isLoggedIn ? <Navigate to="/landingpage" replace /> : <Home /> },
+      { index: true, element: isLoggedIn ? <Navigate to="/home" replace /> : <Home /> },
       { path: "landingpage", element: <LandingPage /> }, // Separate page for logged-in users
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },

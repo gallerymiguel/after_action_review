@@ -103,6 +103,7 @@ const typeDefs = gql`
     register(registerInput: RegisterInput!): Auth
     login(loginInput: LoginInput!): Auth
     saveMission(input: MissionInput!): Mission
+    deleteMission(id: ID!): Mission
   }
 `;
 
