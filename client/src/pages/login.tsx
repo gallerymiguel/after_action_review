@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
       if (data && data.login && data.login.token) {
         console.log("✅ Login Successful. Token:", data.login.token);
         Auth.login(data.login.token);
-        navigate("/");
+        navigate("/home");
       } else {
         console.error("❌ No Token Returned from Server");
         setError("Login failed. No token received.");

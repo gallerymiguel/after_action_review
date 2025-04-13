@@ -14,6 +14,8 @@ import {
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import NavigationBar from "../components/nav"; // Adjust the path if needed
+import { useMutation } from "@apollo/client";
+import { SAVE_MISSION } from "../utils/mutations";
 
 // Define types for mission details and event entries
 interface MissionDetails {
@@ -53,6 +55,7 @@ const MissionForm: React.FC = () => {
       whenWillFix: "",
     },
   });
+  const [saveMission, { error }] = useMutation(SAVE_MISSION);
 
   const [summary, setSummary] = useState("");
   const [hero, setHero] = useState("");
@@ -205,8 +208,7 @@ const MissionForm: React.FC = () => {
     hero: false,
   });
 
-  const handleSaveMission = () => {
-    // Check for missing fields
+  const handleSaveMission = async () => {
     const newErrors = {
       missionName: !mission.missionName,
       missionDate: !mission.missionDate,
@@ -214,21 +216,50 @@ const MissionForm: React.FC = () => {
       summary: showSummaryHero && !summary,
       hero: showSummaryHero && !hero,
     };
-
+  
     setErrors(newErrors);
-
-    // If any field is missing, show an alert and stop submission
+  
     if (Object.values(newErrors).some((error) => error)) {
       alert("⚠️ Please fill out all required fields.");
       return;
     }
-
-    // If all fields are valid, save the mission and navigate to the review page
-    alert("Mission form has been saved successfully! ✅");
-    navigate("/save_mission", { state: { mission, events: [...events], summary, hero } });
+  
+    try {
+      // 1. Save to backend
+      const { data } = await saveMission({
+        variables: {
+          input: {
+            missionName: mission.missionName,
+            missionDate: mission.missionDate?.toISOString(),
+            missionUnit: mission.missionUnit,
+            summary,
+            hero,
+            events: events.map((event) => ({
+              eventName: event.eventName,
+              sustainDetails: event.sustainDetails || [],
+              improveDetailsArray: event.improveDetailsArray || [],
+            })),
+          },
+        },
+      });
+  
+      console.log("✅ Mission saved to backend:", data);
+      const newMissionId = data?.saveMission?._id;
+      
+      // 2. Navigate to review screen like before
+      if (newMissionId) {
+        alert("✅ Mission saved! Redirecting...");
+        navigate(`/mission/${newMissionId}`);
+      } else {
+        alert("❌ Mission saved but could not retrieve ID.");
+      }
+    } catch (err) {
+      console.error("❌ Error saving mission:", err);
+      alert("An error occurred while saving the mission.");
+    }
   };
+  
 
-  console.log("✅ NavigationBar Loaded");
 
   return (
     <>

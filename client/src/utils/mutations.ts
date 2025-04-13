@@ -49,3 +49,23 @@ export const REMOVE_REPORT = gql`
     }
   }
 `;
+
+export const SAVE_MISSION = gql`
+  mutation SaveMission($input: MissionInput!) {
+    saveMission(input: $input) {
+      _id
+      missionName
+      missionDate
+      missionUnit
+    }
+  }
+`;
+
+export const DELETE_MISSION = gql`
+  mutation DeleteMission($id: ID!) {
+    deleteMission(id: $id) {
+      _id
+      missionName
+    }
+  }
+`;

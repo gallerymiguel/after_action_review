@@ -14,8 +14,8 @@ const LandingPage: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "calc(100vh - 64px)", // Leave room for the footer (adjust height as needed)
-        marginLeft: 40,
-        marginRight: 40,
+        marginLeft: 80,
+        marginRight: 80,
         paddingBottom: 4,
         textAlign: "center",
         px: isMobile ? 2 : 4,

@@ -1,49 +1,35 @@
-import { Schema, model, type Document } from 'mongoose';
-import type { UnitDocument } from './Unit';
+import mongoose from "mongoose";
 
-export interface MissionDocument extends Document {
-  id: string;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-  unit: UnitDocument['_id'];
-}
+const ImprovementSchema = new mongoose.Schema({
+  observation: String,
+  howToFix: String,
+  whoWillFix: String,
+  whenWillFix: String,
+});
 
-const missionSchema = new Schema<MissionDocument>(
+const EventSchema = new mongoose.Schema({
+  eventName: String,
+  sustainDetails: [String],
+  improveDetailsArray: [ImprovementSchema],
+});
+
+const MissionSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
+    missionName: { type: String, required: true },
+    missionDate: { type: String, required: true },
+    missionUnit: { type: String, required: true },
+    summary: String,
+    hero: String,
+    events: [EventSchema],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      trim: true
     },
-    startDate: {
-      type: Date,
-      required: true
-    },
-    endDate: {
-      type: Date,
-      required: true,
-      validate: {
-        validator: function(this: MissionDocument, endDate: Date) {
-          return endDate >= this.startDate;
-        },
-        message: 'End date must be after or equal to start date'
-      }
-    },
-    unit: {
-      type: Schema.Types.ObjectId,
-      ref: 'Unit',
-      required: true
-    }
   },
-  {
-    toJSON: {
-      virtuals: true,
-    },
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
-const Mission = model<MissionDocument>('Mission', missionSchema);
-
+const Mission = mongoose.model("Mission", MissionSchema);
 export default Mission;
+
