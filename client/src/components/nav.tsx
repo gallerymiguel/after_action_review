@@ -38,7 +38,7 @@ const NavigationBar: React.FC = () => {
 
   const handleLogout = () => {
     Auth.logout();
-    navigate("/home");
+    navigate("/home", { replace: true });
   };
 
   const menuItems = [
@@ -58,6 +58,7 @@ const NavigationBar: React.FC = () => {
           key={text}
           component={Link as React.ElementType}
           to={path}
+          replace
           startIcon={icon}
           color="inherit"
           sx={{
@@ -88,6 +89,7 @@ const NavigationBar: React.FC = () => {
           <Button
             component={Link as React.ElementType}
             to="/login"
+            replace
             startIcon={<LoginIcon />}
             color="inherit"
             sx={{
@@ -101,6 +103,7 @@ const NavigationBar: React.FC = () => {
           <Button
             component={Link as React.ElementType}
             to="/register"
+            replace
             startIcon={<AccountCircle />}
             color="inherit"
             sx={{
@@ -117,11 +120,7 @@ const NavigationBar: React.FC = () => {
   );
 
   const mobileDrawer = (
-    <Drawer
-      anchor="right"
-      open={mobileOpen}
-      onClose={handleDrawerToggle}
-    >
+    <Drawer anchor="right" open={mobileOpen} onClose={handleDrawerToggle}>
       <List sx={{ width: 250 }}>
         {menuItems.map(({ text, icon, path }) => (
           <ListItem
@@ -129,6 +128,7 @@ const NavigationBar: React.FC = () => {
             button
             component={Link as React.ElementType}
             to={path}
+            replace
             onClick={handleDrawerToggle}
           >
             <ListItemIcon>{icon}</ListItemIcon>
@@ -155,6 +155,7 @@ const NavigationBar: React.FC = () => {
               button
               component={Link as React.ElementType}
               to="/login"
+              replace
               onClick={handleDrawerToggle}
             >
               <ListItemIcon>
@@ -166,6 +167,7 @@ const NavigationBar: React.FC = () => {
               button
               component={Link as React.ElementType}
               to="/register"
+              replace
               onClick={handleDrawerToggle}
             >
               <ListItemIcon>

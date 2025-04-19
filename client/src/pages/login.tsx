@@ -59,15 +59,15 @@ const LoginPage: React.FC = () => {
 
       if (data?.login?.token) {
         Auth.login(data.login.token);
-        console.log("[LoginPage] after successful login, redirecting with:", {
-          returnTo,
-          draft,
-        });
+        // console.log("[LoginPage] after successful login, redirecting with:", {
+        //   returnTo,
+        //   draft,
+        // });
         // If we have a draft, go back to that page with the same draft
         if (draft) {
           navigate(returnTo ?? "/home", { state: { draft } });
         } else {
-          navigate(returnTo ?? "/home");
+          navigate("/home", { replace: true });
         }
       } else {
         setError("Login failed: no token returned.");
