@@ -1,5 +1,5 @@
 // src/pages/home.tsx
-
+import { Navigate } from "react-router-dom";
 import React from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -9,7 +9,11 @@ const Home: React.FC = () => {
   // No state or useEffect needed—synchronously read auth
   const isLoggedIn = Auth.loggedIn();
   const user = isLoggedIn ? Auth.getProfile() : null;
-
+  if (!isLoggedIn) {
+         // kick unauthenticated users to the real landing page
+         return <Navigate to="/landingpage" replace />;
+       }
+       
   return (
     <Container maxWidth="md" className="home-container">
       <Box textAlign="center" mt={5}>

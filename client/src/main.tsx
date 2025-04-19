@@ -19,7 +19,7 @@ import CreateAccountPage from "./pages/register";
 import MissionForm from "./pages/mission_form";
 import ReviewPage from "./pages/saving_mission_review";
 import MyReviews from "./pages/myreviews";
-import Auth from "./utils/auth"; // Import auth to check login status
+// import Auth from "./utils/auth"; // Import auth to check login status
 import LandingPage from "./pages/landingpage";
 import { setContext } from "@apollo/client/link/context";
 
@@ -45,7 +45,7 @@ const client = new ApolloClient({
 });
 
 // Check if user is logged in
-const isLoggedIn = Auth.loggedIn();
+// const isLoggedIn = Auth.loggedIn();
 
 const router = createBrowserRouter([
   {
@@ -53,8 +53,8 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <LandingPage /> },
-      { path: "landingpage", element: <LandingPage /> }, // Separate page for logged-in users
+      { index: true, element: <Navigate to="/landingpage" replace />},
+      { path: "landingpage", element: <LandingPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
       { path: "mission/new", element: <MissionForm /> },

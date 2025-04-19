@@ -120,7 +120,7 @@ export const resolvers = {
     
       await Mission.findByIdAndDelete(id);
       return mission;
-    }
+    },
     
     // createUnit: async (_: any, { input }: { input: { name: string } }, context: Context) => {
     //   if (!context.user || context.user.role !== UserRole.EVALUATOR) {
@@ -182,6 +182,8 @@ export const resolvers = {
     //   }
     //   return null;
     // },
+
+    
     saveMission: async (_: any, { input }: { input: any }, context: Context) => {
       if (!context.user) {
         throw new AuthenticationError('You must be logged in to save a mission');
@@ -199,7 +201,6 @@ export const resolvers = {
         throw new Error("Failed to save mission");
       }
     }
-    
   }
 };
 
