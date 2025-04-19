@@ -1,19 +1,21 @@
+// src/pages/home.tsx
+
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
-import Auth from "../utils/auth"; // Import Auth to get user info
+import { Link, useLocation } from "react-router-dom";
+import Auth from "../utils/auth";
 
 const Home: React.FC = () => {
-  // const user = Auth.loggedIn() ? Auth.getProfile() : null; // Get logged-in user
   const [user, setUser] = useState<any>(null);
-  
+  const location = useLocation();
+
   useEffect(() => {
     if (Auth.loggedIn()) {
       const profile = Auth.getProfile();
       setUser(profile);
     }
   }, []);
-  
-  
+
   return (
     <Container maxWidth="md" className="home-container">
       <Box textAlign="center" mt={5}>
@@ -34,7 +36,13 @@ const Home: React.FC = () => {
             <Typography variant="h5" color="textSecondary" paragraph>
               A structured process to analyze what happened, why it happened, and how it can be improved.
             </Typography>
-            <Button variant="contained" color="primary" href="/login">
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to="/login"
+              state={{ returnTo: location.pathname }}
+            >
               Get Started
             </Button>
           </>
@@ -45,4 +53,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
