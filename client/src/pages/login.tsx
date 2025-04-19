@@ -1,5 +1,6 @@
+// src/pages/login.tsx
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -13,41 +14,69 @@ import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
 import Auth from "../utils/auth";
 
+// Paste this at the top, before the component:
+interface LocationState {
+  returnTo?: string;
+  draft?: {
+    mission: {
+      missionName: string;
+      missionDate: string;
+      missionUnit: string;
+    };
+    events: Array<{
+      eventName: string;
+      sustainDetails: string[];
+      improveDetailsArray: Array<{
+        observation: string;
+        howToFix: string;
+        whoWillFix: string;
+        whenWillFix: string;
+      }>;
+    }>;
+    summary: string;
+    hero: string;
+  };
+}
+
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Cast location.state once so TS knows its shape
+  const { returnTo, draft } = (location.state ?? {}) as LocationState;
+  console.log("[LoginPage] got from location.state:", { returnTo, draft });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  
   const [login, { error: mutationError }] = useMutation(LOGIN_USER);
 
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-  
     try {
       const { data } = await login({
-        variables: {
-          loginInput: { email, password },
-        },
+        variables: { loginInput: { email, password } },
       });
-  
-      console.log("🔍 Full Response from GraphQL:", data);
-  
-      if (data && data.login && data.login.token) {
-        console.log("✅ Login Successful. Token:", data.login.token);
+
+      if (data?.login?.token) {
         Auth.login(data.login.token);
-        navigate("/home");
+        console.log("[LoginPage] after successful login, redirecting with:", {
+          returnTo,
+          draft,
+        });
+        // If we have a draft, go back to that page with the same draft
+        if (draft) {
+          navigate(returnTo ?? "/home", { state: { draft } });
+        } else {
+          navigate(returnTo ?? "/home");
+        }
       } else {
-        console.error("❌ No Token Returned from Server");
-        setError("Login failed. No token received.");
+        setError("Login failed: no token returned.");
       }
-    } catch (err) {
-      console.error("❌ Login Error:", err);
-      setError("Login failed. Check your credentials.");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err.message || "Login failed. Check your credentials.");
     }
   };
-
 
   return (
     <Container
@@ -59,13 +88,12 @@ const LoginPage: React.FC = () => {
         height: "50vh",
       }}
     >
-      <Paper elevation={3} sx={{ padding: 3, width: "100%" }}>
+      <Paper elevation={3} sx={{ p: 3, width: "100%" }}>
         <Box textAlign="center" mb={3}>
           <Typography variant="h4">Login</Typography>
         </Box>
         <form onSubmit={handleFormSubmit}>
           <Grid container spacing={3}>
-            {/* Email Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -76,8 +104,6 @@ const LoginPage: React.FC = () => {
                 required
               />
             </Grid>
-
-            {/* Password Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -89,8 +115,6 @@ const LoginPage: React.FC = () => {
                 required
               />
             </Grid>
-
-            {/* Submit Button */}
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -104,27 +128,23 @@ const LoginPage: React.FC = () => {
           </Grid>
         </form>
 
-        {/* Error Message */}
         {mutationError && (
           <Box textAlign="center" mt={2}>
-            <Typography variant="body2" color="error">
-              {mutationError.message}
-            </Typography>
+            <Typography color="error">{mutationError.message}</Typography>
+          </Box>
+        )}
+        {error && (
+          <Box textAlign="center" mt={2}>
+            <Typography color="error">{error}</Typography>
           </Box>
         )}
 
-        {/* Show Custom Error */}
-        {error && (
-          <Box textAlign="center" mt={2}>
-            <Typography variant="body2" color="error">
-              {error}
-            </Typography>
-          </Box>
-        )}
-        {/* Link to Signup Page */}
         <Box textAlign="center" mt={2}>
           <Typography variant="body2">
-            Don't have an account? <Link to="/register">Sign up</Link>
+            Don't have an account?{" "}
+            <Link to="/register" state={{ returnTo, draft }}>
+              Sign up
+            </Link>
           </Typography>
         </Box>
       </Paper>

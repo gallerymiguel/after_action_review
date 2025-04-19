@@ -48,11 +48,11 @@ const router = createBrowserRouter([
       { path: "landingpage", element: <LandingPage /> }, // Separate page for logged-in users
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
-      { path: "review", element: <MissionForm /> },
-      { path: "save_mission", element: <ReviewPage /> },
+      { path: "mission/new", element: <MissionForm /> },
+      { path: "mission/review", element: <ReviewPage /> },
+      { path: "mission/:id", element: <ReviewPage /> },    
       { path: "myreviews", element: <MyReviews /> },
       { path: "home", element: <Home />}, // Add this line to include the Home component
-      { path: "mission/:id", element: <ReviewPage /> },
     ],
   },
 ]);
