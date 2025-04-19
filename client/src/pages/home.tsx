@@ -1,20 +1,14 @@
 // src/pages/home.tsx
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 
 const Home: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
-  const location = useLocation();
-
-  useEffect(() => {
-    if (Auth.loggedIn()) {
-      const profile = Auth.getProfile();
-      setUser(profile);
-    }
-  }, []);
+  // No state or useEffect needed—synchronously read auth
+  const isLoggedIn = Auth.loggedIn();
+  const user = isLoggedIn ? Auth.getProfile() : null;
 
   return (
     <Container maxWidth="md" className="home-container">
@@ -41,7 +35,6 @@ const Home: React.FC = () => {
               color="primary"
               component={Link}
               to="/login"
-              state={{ returnTo: location.pathname }}
             >
               Get Started
             </Button>

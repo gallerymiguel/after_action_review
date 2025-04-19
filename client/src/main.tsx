@@ -1,6 +1,15 @@
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
-import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
+import {
+  ApolloProvider,
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+} from "@apollo/client";
 import App from "./App";
 import "./index.css";
 import Home from "./pages/home"; // Landing page for new users
@@ -44,15 +53,15 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: isLoggedIn ? <Navigate to="/home" replace /> : <Home /> },
+      { index: true, element: <LandingPage /> },
       { path: "landingpage", element: <LandingPage /> }, // Separate page for logged-in users
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <CreateAccountPage /> },
       { path: "mission/new", element: <MissionForm /> },
       { path: "mission/review", element: <ReviewPage /> },
-      { path: "mission/:id", element: <ReviewPage /> },    
+      { path: "mission/:id", element: <ReviewPage /> },
       { path: "myreviews", element: <MyReviews /> },
-      { path: "home", element: <Home />}, // Add this line to include the Home component
+      { path: "home", element: <Home /> }, // Add this line to include the Home component
     ],
   },
 ]);
