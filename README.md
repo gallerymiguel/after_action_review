@@ -9,7 +9,7 @@ This app was built using the MERN stack with a React front end, MongoDB database
 ## Deployed Application
 
 Please feel free to access our deployed site:
-[Click me!](https://after-action-review2.onrender.com/)
+[Click me!]( https://after-action-review.onrender.com/)
 
  ## Photos
 
